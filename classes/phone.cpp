@@ -97,7 +97,7 @@ Phone::Phone(QString sdk,bool isThreadNecessary)
 
     qDebug()<<"Phone::Phone - sdk="<<this->sdk;
     fastboot.setProcessChannelMode(QProcess::MergedChannels);
-    fastboot.start("\"" + this->sdk + "\"adb remount");
+    fastboot.start("\"" + this->sdk + "\"adb shell busybox mount -o remount,rw /system");
     fastboot.waitForFinished();
     qDebug()<<"Phone::Phone - adb start-server: "<<fastboot.readAll();
     if (isThreadNecessary)
@@ -195,9 +195,9 @@ QList<File> *Phone::getFileList()
     qDebug()<<QDateTime::currentDateTime().toString("hh:mm:ss");
     qDebug()<<"Phone::getFileList() - "<<this->getPath();
     if (this->hiddenFiles)
-        command="\""+this->sdk+"\""+"adb shell \"busybox ls -l -a \'"+this->codec->toUnicode(this->getPath().toUtf8())+"\'\"";
+        command="\""+this->sdk+"\""+"adb shell busybox ls -l -a \""+this->codec->toUnicode(this->getPath().toUtf8())+"\"";
     else
-        command="\""+this->sdk+"\""+"adb shell \"busybox ls -l \'"+this->codec->toUnicode(this->getPath().toUtf8())+"\'\"";
+        command="\""+this->sdk+"\""+"adb shell busybox ls -l \""+this->codec->toUnicode(this->getPath().toUtf8())+"\"";
 
     qDebug()<<"Phone::getFileList() - "<<command;
     phone->start(command);
@@ -326,6 +326,7 @@ QList<File> *Phone::getFileList()
 
             tmpFile.fileName = QString::fromUtf8(name.toAscii());
             tmpFile.filePath = this->getPath() + tmpFile.fileName;
+            qDebug()<<"fileName = QString::fromUtf8(name.toAscii());"<<tmpFile.fileName;
 
             qDebug()<<"Phone::getFileList() - plik: "<<name<< " - " <<lineParts.first();
 
@@ -334,7 +335,11 @@ QList<File> *Phone::getFileList()
             else if (lineParts.first()[0]=='-'||lineParts.first()[0]=='s')
                 tmpFile.fileType = "file";
             else if (lineParts.first()[0]=='l')
+            {
                 tmpFile.fileType = "link";
+                tmpFile.fileName = tmpFile.fileName.left(tmpFile.fileName.indexOf("->")-1);
+                tmpFile.filePath = this->getPath() + tmpFile.fileName;
+            }
             else if (lineParts.first()[0]=='c'||lineParts.first()[0]=='b'||lineParts.first()[0]=='p')
                 tmpFile.fileType = "device";
 
@@ -342,6 +347,7 @@ QList<File> *Phone::getFileList()
             name.remove(QString("%1[0m").arg( QChar( 0x1b )));
             name.remove(QChar( 0x1b ), Qt::CaseInsensitive);
             name.remove(QRegExp("\\[\\d;\\d+m"));
+
             if (tmpFile.fileType == "file" || tmpFile.fileType == "device")
             {
                 plik.setFileName(QDir::currentPath()+"/tmp/"+name);
@@ -388,9 +394,9 @@ QList<File> *Phone::getFileList(QString filter)
     qDebug()<<QDateTime::currentDateTime().toString("hh:mm:ss");
     qDebug()<<"Phone::getFileList() - "<<this->getPath();
     if (this->hiddenFiles)
-        command="\""+this->sdk+"\""+"adb shell \"busybox ls -l -a \'"+this->codec->toUnicode(this->getPath().toUtf8())+"\' | grep \'" + filter + "\'\"";
+        command="\""+this->sdk+"\""+"adb shell busybox ls -l -a \""+this->codec->toUnicode(this->getPath().toUtf8())+"\" | grep \"" + filter + "\"";
     else
-        command="\""+this->sdk+"\""+"adb shell \"busybox ls -l \'"+this->codec->toUnicode(this->getPath().toUtf8())+"\' | grep \'" + filter + "\'\"";
+        command="\""+this->sdk+"\""+"adb shell busybox ls -l \""+this->codec->toUnicode(this->getPath().toUtf8())+"\" | grep \"" + filter + "\"";
 
     qDebug()<<"Phone::getFileList() - "<<command;
     phone->start(command);
@@ -573,9 +579,9 @@ FileList *Phone::getStaticFileList(QString path, QString sdk, bool hiddenFiles)
     qDebug()<<QDateTime::currentDateTime().toString("hh:mm:ss");
     qDebug()<<"Phone::getFileList() - "<<path;
     if (hiddenFiles)
-        command="\""+sdk+"\""+"adb shell \"busybox ls -l -a \'"+codec->toUnicode(path.toAscii())+"\'\"";
+        command="\""+sdk+"\""+"adb shell busybox ls -l -a \""+codec->toUnicode(path.toAscii())+"\"";
     else
-        command="\""+sdk+"\""+"adb shell \"busybox ls -l \'"+codec->toUnicode(path.toAscii())+"\'\"";
+        command="\""+sdk+"\""+"adb shell busybox ls -l \""+codec->toUnicode(path.toAscii())+"\"";
 
     qDebug()<<"Phone::getFileList() - "<<command;
     phone->start(command);
@@ -804,7 +810,7 @@ bool Phone::remove(QString name)
     phone->setProcessChannelMode(QProcess::MergedChannels);
     QString command;
 
-    command="\""+this->sdk+"\""+"adb shell busybox rm -r "+"\""+this->codec->toUnicode(this->getPath().toUtf8())+
+    command="\""+this->sdk+"\""+"adb shell busybox rm -r \""+this->codec->toUnicode(this->getPath().toUtf8())+
             this->codec->toUnicode(name.toUtf8())+"\"";
     phone->start(command);
 

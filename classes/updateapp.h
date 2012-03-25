@@ -38,7 +38,7 @@ private:
     QNetworkAccessManager * updateMan;
 
 signals:
-    void updateState(bool, QString, QString);
+    void updateState(bool, QString, QString, QString);
 public slots:
     void gotWWW(QNetworkReply *);
 };
