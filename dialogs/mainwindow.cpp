@@ -89,7 +89,7 @@ MainWindow::MainWindow(QWidget *parent) :QMainWindow(parent),ui(new Ui::MainWind
     if (this->settingsWidget->saveWindowPosition)
         this->restoreGeometry(this->settingsWidget->windowGeometry);
 
-    this->initial == "device not found";
+    this->initial = "device not found";
     this->detectCwm();
 
     this->ui->toolBar->setMovable(false);
