@@ -117,13 +117,13 @@ private:
     QWidget *currentWidget;
     QWidget *targetWidget;
 
-    bool debugMode, lastCwm, recoveryCwm;
+    bool debugMode, lastCwm;
     QFile *debugFile;
     bool killDemonOnExit;
 
     bool showNoUpdates;
 
-    QString ipAddress, portNumber;
+    QString ipAddress, portNumber, initial;
 
     QTextCodec *codec;
 
@@ -192,6 +192,7 @@ private slots:
 
     void donateMessage();
     void on_actionEnter_register_key_triggered();
+    void detectCwm();
 };
 
 #endif // MAINWINDOW_H

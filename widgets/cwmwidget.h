@@ -149,6 +149,7 @@ private slots:
     void on_buttonSystem_pressed();
     void on_buttonSdext_pressed();
     void on_buttonSdcard_pressed();
+    void fixMarket();
 
 signals:
     void phoneConnectionChanged(int);

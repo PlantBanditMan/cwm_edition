@@ -776,11 +776,11 @@ void ThreadUninstall::run()
         {
             emit this->uninstalled(tr("SUCCESS"), "");
         }
-        if (this->system)
-        {
-            proces->start("\""+this->sdk+"\""+"adb shell busybox mount -o remount,ro,noatime /system");
-            proces->waitForFinished(-1);
-        }
+//        if (this->system)
+//        {
+//            proces->start("\""+this->sdk+"\""+"adb shell busybox mount -o remount,ro,noatime /system");
+//            proces->waitForFinished(-1);
+//        }
     }
     delete proces;
     emit this->uninstalled("finished", "");

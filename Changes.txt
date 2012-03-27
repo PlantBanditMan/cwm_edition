@@ -1,3 +1,6 @@
+-improved /system remount behavior, detection of CWM Recovery, "Fix Market" function;
+
+
 Changes:
 
 What is different from current official build 0.8.1:

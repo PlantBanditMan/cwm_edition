@@ -468,10 +468,10 @@ void fipDialog::okButtonClicked()
         QMessageBox::critical(0,"chmod ERROR:",outputChmod);
         this->deleteLater();
     }
-    if (fileC.startsWith("/system"))
-    {
-        proces->start("\""+sdk+"\""+"adb shell busybox mount -o remount,ro,noatime /system");
-        proces->waitForFinished(-1);
-    }
+//    if (fileC.startsWith("/system"))
+//    {
+//        proces->start("\""+sdk+"\""+"adb shell busybox mount -o remount,ro,noatime /system");
+//        proces->waitForFinished(-1);
+//    }
     this->close();
 }

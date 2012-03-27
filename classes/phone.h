@@ -98,7 +98,7 @@ private:
 
     QString connecionMode;
     int connectionState;
-    bool hiddenFiles;
+    bool hiddenFiles, remountRo;
     QString path;
     QString sdk;
 

@@ -1511,6 +1511,8 @@ void CwmWidget::backupAvailable()
         processWhich->start("\""+sdk+"\"" + "adb shell busybox /cache/qtadb/domd5sum.sh \"" + this->threadSdcard->backupPath + "\"" );
         processWhich->waitForReadyRead(-1);
     }
+    else if (which == "fix market")
+        this->fixMarket();
 }
 
 void CwmWidget::on_buttonUpdate_pressed()
@@ -1604,15 +1606,41 @@ void CwmWidget::on_buttonFlash_pressed()
 
 void CwmWidget::on_buttonFixMarket_pressed()
 {
-    QString market;
-    commandRunning = "Not Running";
-    if (this->ui->buttonFixMarket->text() == "Undo Fix Market")
-        market = this->adbPushTool("undofixmarket.sh");
-    else if (this->ui->buttonFixMarket->text() == "Fix Market")
-        market = this->adbPushTool("dofixmarket.sh");
-    this->processStarted();
-    process->start("\"" + sdk + "\"" + "adb shell " + market);
-    process->waitForReadyRead(-1);
+    this->ui->plainTextEditStatus->clear();
+    this->ui->tabWidget_2->setCurrentIndex(1);
+    this->ui->plainTextEditStatus->setStyleSheet( "QPlainTextEdit {background-color:black;color:white;border: 1px solid #020202;border-radius: 1px;}" );
+    this->ui->plainTextEditStatus->insertPlainText("Mounting SD Card... Please, wait...");
+    this->ui->plainTextEditStatus->ensureCursorVisible();
+    QProcess *sd = new QProcess;
+    QString outsd;
+    sd->start("\""+this->sdk+"\"" + "adb shell busybox find /dev/block/mmc*");
+    sd->waitForFinished(-1);
+    outsd = sd->readAll();
+    if (outsd.contains("No such file"))
+    {
+        if (QMessageBox::question(this, tr("Reboot:"),"Your phone failed to detect SD Card! Reboot is required.\n\nDo you want to Reboot it now?",QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+            this->phone->adbReboot();
+        else
+        {
+            this->ui->plainTextEditStatus->insertPlainText("\n\nSD Card not detected! Phone needs reboot!");
+            this->ui->plainTextEditStatus->ensureCursorVisible();
+        }
+        return;
+    }
+    sd->start("\""+this->sdk+"\"" + "adb shell busybox ls /sdcard");
+    sd->waitForFinished(-1);
+    outsd = sd->readAll();
+    if (outsd.isEmpty())
+    {
+        which = "fix market";
+        this->threadSdcard = new ThreadSdcard;
+        this->threadSdcard->backupPath = "/sdcard/LOST.DIR";
+        this->threadSdcard->sdk = this->sdk;
+        connect(this->threadSdcard,SIGNAL(backupVerifiable()),this,SLOT(backupAvailable()));
+        this->threadSdcard->start();
+    }
+    else
+        this->fixMarket();
 }
 
 void CwmWidget::on_buttonRecovery_pressed()
@@ -1839,4 +1867,18 @@ void CwmWidget::lineBackupClear()
 {
     this->ui->lineBackup->clear();
     this->activateButtonInsert();
+}
+
+void CwmWidget::fixMarket()
+{
+    which = "";
+    QString market;
+    commandRunning = "Not Running";
+    if (this->ui->buttonFixMarket->text() == "Undo Fix Market")
+        market = this->adbPushTool("undofixmarket.sh");
+    else if (this->ui->buttonFixMarket->text() == "Fix Market")
+        market = this->adbPushTool("dofixmarket.sh");
+    this->processStarted();
+    process->start("\"" + sdk + "\"" + "adb shell " + market);
+    process->waitForReadyRead(-1);
 }

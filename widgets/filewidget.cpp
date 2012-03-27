@@ -2512,11 +2512,11 @@ void FileWidget::saveFile()
         disconnect(edit, SIGNAL(finished(int)), msg, SLOT(accept()));
         edit->start("\""+sdk+"\""+"adb shell busybox chmod " + chmod.append(" \"") + filePath + "\"");
         edit->waitForFinished(-1);
-        if (folder.startsWith("/system"))
-        {
-            edit->start("\""+sdk+"\""+"adb shell busybox mount -o remount,ro,noatime /system");
-            edit->waitForFinished(-1);
-        }
+//        if (folder.startsWith("/system"))
+//        {
+//            edit->start("\""+sdk+"\""+"adb shell busybox mount -o remount,ro,noatime /system");
+//            edit->waitForFinished(-1);
+//        }
         removeFile();
         rightDisplay();
         if (this->leftMode=="phone")

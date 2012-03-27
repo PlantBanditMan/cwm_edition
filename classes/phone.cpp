@@ -94,9 +94,14 @@ Phone::Phone(QString sdk,bool isThreadNecessary)
     QProcess fastboot;
     this->sdk=sdk;
     this->codec = QTextCodec::codecForLocale();
-
+    this->remountRo = false;
     qDebug()<<"Phone::Phone - sdk="<<this->sdk;
     fastboot.setProcessChannelMode(QProcess::MergedChannels);
+    fastboot.start("\"" + this->sdk + "\"adb shell busybox mount");
+    fastboot.waitForFinished();
+    QString ro = fastboot.readAll();
+    if (ro.contains("/system type yaffs2 (ro"))
+        this->remountRo = true;
     fastboot.start("\"" + this->sdk + "\"adb shell busybox mount -o remount,rw /system");
     fastboot.waitForFinished();
     qDebug()<<"Phone::Phone - adb start-server: "<<fastboot.readAll();
@@ -108,6 +113,12 @@ Phone::Phone(QString sdk,bool isThreadNecessary)
 
 Phone::~Phone()
 {
+    if (this->remountRo)
+    {
+        QProcess remountro;
+        remountro.start("\""+sdk+"\""+"adb shell busybox mount -o remount,ro,noatime /system");
+        remountro.waitForFinished(-1);
+    }
     if (this->connectionThread.isRunning())
         this->connectionThread.terminate();
 }

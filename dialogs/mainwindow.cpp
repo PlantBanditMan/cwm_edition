@@ -89,20 +89,15 @@ MainWindow::MainWindow(QWidget *parent) :QMainWindow(parent),ui(new Ui::MainWind
     if (this->settingsWidget->saveWindowPosition)
         this->restoreGeometry(this->settingsWidget->windowGeometry);
 
+    this->initial == "device not found";
+    this->detectCwm();
+
     this->ui->toolBar->setMovable(false);
 
     this->addButton(QIcon(":icons/files.png"), tr("Files", "files button"), "Files" , SLOT(showPageFiles()), Action::Device | Action::Recovery);
     this->addButton(QIcon(":icons/apps.png"), tr("Apps", "apps button"), "Apps", SLOT(showPageApps()), Action::Device | Action::Recovery);
-
-    if (this->recoveryCwm)
-    {
-        this->addButton(QIcon(":icons/recovery.png"), tr("CWM", "cwm button"), "CWM", SLOT(showPageCwm()), Action::Device | Action::Recovery);
-    }
-    else
-    {
-        this->addButton(QIcon(":icons/recovery.png"), tr("Recovery", "recovery button"), "Recovery", SLOT(showPageRecovery()), Action::Recovery);
-    }
-
+    this->addButton(QIcon(":icons/recovery.png"), tr("CWM", "cwm button"), "CWM", SLOT(showPageCwm()), Action::Device | Action::Recovery);
+    this->addButton(QIcon(":icons/recovery.png"), tr("Recovery", "recovery button"), "Recovery", SLOT(showPageRecovery()), Action::Recovery);
     this->addButton(QIcon(":icons/fastboot.png"), tr("Fastboot", "fastbot button"), "Fastboot", SLOT(showPageFastboot()), Action::Fastboot);
     this->addButton(QIcon(":icons/info.png"), tr("Phone info", "phone info button"), "Phone info", SLOT(showPagePhoneInfo()), Action::Device | Action::Recovery | Action::Disconnected | Action::Fastboot);
     this->addButton(QIcon(":icons/screenshot.png"), tr("Screenshot", "screenshot button"), "Screenshot", SLOT(showPageScreenshot()), Action::Device | Action::Recovery);
@@ -421,16 +416,8 @@ void MainWindow::on_actionO_programie_triggered()
 
 void MainWindow::phoneConnectionChanged(int state)
 {
-    QProcess detectRecovery;
-    QSettings settings;
-    QString sdk = settings.value("sdkPath").toString();
-    detectRecovery.start("\""+sdk+"\"" + "adb shell busybox cat /cache/recovery/last_log");
-    detectRecovery.waitForFinished(-1);
-    QString outputLog = detectRecovery.readAll();
-    if (outputLog.contains("extendedcommand"))
-        this->recoveryCwm = true;
-    else
-        this->recoveryCwm = false;
+    if (this->initial == "device not found")
+        this->detectCwm();
     if (state == DISCONNECTED)
     {
         if (ui->stackedWidget->currentWidget()!=ui->pageDisconnected)
@@ -460,7 +447,7 @@ void MainWindow::phoneConnectionChanged(int state)
         this->ui->menuFastboot->setDisabled(true);
 
         this->disableActions(Action::Device);
-        if (this->recoveryCwm)
+        if (this->initial == "extendedcommand")
         {
             if (this->lastCwm)
                 this->showPageCwm();
@@ -486,7 +473,7 @@ void MainWindow::phoneConnectionChanged(int state)
         this->ui->menuFastboot->setDisabled(true);
 
         this->disableActions(Action::Recovery);
-        if (this->recoveryCwm)
+        if (this->initial == "extendedcommand")
         {
             if (this->lastCwm)
                 this->showPageCwm();
@@ -510,7 +497,7 @@ void MainWindow::phoneConnectionChanged(int state)
 //        disconnect(this->ui->buttonPhoneInfo, SIGNAL(clicked()), this, SLOT(showPagePhoneInfo()));
     }
 
-    if (this->recoveryCwm)
+    if (this->initial == "extendedcommand")
     {
         if (this->lastCwm)
             this->cwmWidget->phone->procesEvents=true;
@@ -1099,6 +1086,18 @@ void MainWindow::disableActions(Action::Flags flag)
                 akcje.at(i).actionToolBar->setVisible(true);
             akcje.at(i).button->setEnabled(false);
         }
+        if (this->initial == "No such file" && akcje.at(i).text == "CWM")
+        {
+            akcje.at(i).actionMenu->setEnabled(false);
+            akcje.at(i).actionToolBar->setVisible(false);
+            akcje.at(i).button->setEnabled(false);
+        }
+        else if (this->initial == "extendedcommand" && akcje.at(i).text == "Recovery")
+        {
+            akcje.at(i).actionMenu->setEnabled(false);
+            akcje.at(i).actionToolBar->setVisible(false);
+            akcje.at(i).button->setEnabled(false);
+        }
         akcje.at(i).button->show();
     }
 }
@@ -1165,4 +1164,20 @@ void MainWindow::on_actionEnter_register_key_triggered()
 {
     RegisterDialog *registerDialog = new RegisterDialog(this,Phone::getGoogleAccounts());
     registerDialog->exec();
+}
+
+void MainWindow::detectCwm()
+{
+    QProcess detectRecovery;
+    QSettings settings;
+    QString sdk = settings.value("sdkPath").toString();
+    detectRecovery.start("\""+sdk+"\"" + "adb shell busybox cat /cache/recovery/last_log");
+    detectRecovery.waitForFinished(-1);
+    QString outputLog = detectRecovery.readAll();
+    if (outputLog.contains("extendedcommand"))
+        this->initial = "extendedcommand";
+    else if (outputLog.contains("No such file"))
+        this->initial = "No such file";
+    else if (!outputLog.contains("device not found"))
+        this->initial = "device not found";
 }
