@@ -1083,7 +1083,7 @@ void ThreadBackups::run()
 
     if (onsdcard == false)
     {
-        proces->start("findstr /S -M app.name= \"" + codec->toUnicode(backuponpc.toUtf8()) + "*\"");
+        proces->start("findstr /S -M app.name= \"" + backuponpc + "*\"");
         proces->waitForFinished(-1);
         output = proces->readAll();
     }
@@ -1121,7 +1121,7 @@ void ThreadBackups::run()
         namedir.append("/");
         if (onsdcard == false)
         {
-            QFile file(codec->toUnicode(backuponpc.toUtf8()) + codec->toUnicode(namedir.toUtf8())+codec->toUnicode(backupFound.packageName.toUtf8())+".txt");
+            QFile file(backuponpc + namedir+backupFound.packageName+".txt");
             if (!file.open (QIODevice::ReadOnly))
                  break;
             QTextStream stream ( &file );
@@ -1146,11 +1146,11 @@ void ThreadBackups::run()
         {
             QString iconfile;
             if (onsdcard == false)
-                iconfile = codec->toUnicode(backuponpc.toUtf8()) + codec->toUnicode(namedir.toUtf8())+codec->toUnicode(backupFound.packageName.toUtf8())+".png";
+                iconfile = backuponpc + namedir+backupFound.packageName+".png";
             else
             {
-                iconfile = QDir::currentPath()+"/tmp/"+codec->toUnicode(backupFound.packageName.toUtf8())+".png";
-                proces->start("\"" + this->sdk + "\"adb pull \""+codec->toUnicode(appsBackupFolder.toUtf8())+ codec->toUnicode(namedir.toUtf8())+codec->toUnicode(backupFound.packageName.toUtf8())+".png\" "+codec->toUnicode(iconfile.toUtf8()));
+                iconfile = QDir::currentPath()+"/tmp/"+backupFound.packageName+".png";
+                proces->start("\"" + this->sdk + "\"adb pull \""+appsBackupFolder+ namedir+backupFound.packageName+".png\" "+iconfile);
                 proces->waitForFinished(-1);
             }
             QFile icon(iconfile);
@@ -1186,7 +1186,7 @@ void ThreadBackups::run()
         }
         if (onsdcard == false)
         {
-           if (!QFile::exists(codec->toUnicode(backuponpc.toUtf8()) + codec->toUnicode(namedir.toUtf8())+codec->toUnicode(backupFound.packageName.toUtf8())+".apk"))
+           if (!QFile::exists(backuponpc + namedir+backupFound.packageName+".apk"))
                backupFound.withApk = false;
            else
                backupFound.withApk = true;
@@ -1203,7 +1203,7 @@ void ThreadBackups::run()
         }
         if (onsdcard == false)
         {
-            if (!QFile::exists(codec->toUnicode(backuponpc.toUtf8()) + codec->toUnicode(namedir.toUtf8())+codec->toUnicode(backupFound.packageName.toUtf8())+".DATA.tar.gz"))
+            if (!QFile::exists(backuponpc + namedir+backupFound.packageName+".DATA.tar.gz"))
                 backupFound.withData = false;
             else
                 backupFound.withData = true;

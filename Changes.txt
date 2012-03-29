@@ -1,3 +1,13 @@
+
+3/29/2012 
+-improved /system remount behavior;
+-CWM Page renamed to Advanced and some of its generic functions are enabled even if CWM Recovery is not detected;
+- new function "Run Script" added to Advanced Page - run shell script from PC or /sdcard;
+-minor bug fixes;
+
+
+
+
 -improved /system remount behavior, detection of CWM Recovery, "Fix Market" function;
 
 

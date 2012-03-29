@@ -140,7 +140,7 @@ private:
 
 public slots:
 
-    void refreshState();
+    void on_buttonRefresh_pressed();
 
 private slots:
 
@@ -185,7 +185,7 @@ private slots:
 
     void addButton(QIcon icon, QString textTr, QString text, const char * method, int flags);
     void changeToolBar();
-    void setButtonDown(int number);
+    void setButtonDown(int number, QString text);
     void disableActions(Action::Flags);
     void setProgressValue(int value, int max);
     void setProgressDisable();

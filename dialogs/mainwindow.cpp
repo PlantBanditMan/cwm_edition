@@ -96,7 +96,7 @@ MainWindow::MainWindow(QWidget *parent) :QMainWindow(parent),ui(new Ui::MainWind
 
     this->addButton(QIcon(":icons/files.png"), tr("Files", "files button"), "Files" , SLOT(showPageFiles()), Action::Device | Action::Recovery);
     this->addButton(QIcon(":icons/apps.png"), tr("Apps", "apps button"), "Apps", SLOT(showPageApps()), Action::Device | Action::Recovery);
-    this->addButton(QIcon(":icons/recovery.png"), tr("CWM", "cwm button"), "CWM", SLOT(showPageCwm()), Action::Device | Action::Recovery);
+    this->addButton(QIcon(":icons/recovery.png"), tr("Advanced", "cwm button"), "Advanced", SLOT(showPageCwm()), Action::Device | Action::Recovery);
     this->addButton(QIcon(":icons/recovery.png"), tr("Recovery", "recovery button"), "Recovery", SLOT(showPageRecovery()), Action::Recovery);
     this->addButton(QIcon(":icons/fastboot.png"), tr("Fastboot", "fastbot button"), "Fastboot", SLOT(showPageFastboot()), Action::Fastboot);
     this->addButton(QIcon(":icons/info.png"), tr("Phone info", "phone info button"), "Phone info", SLOT(showPagePhoneInfo()), Action::Device | Action::Recovery | Action::Disconnected | Action::Fastboot);
@@ -122,7 +122,7 @@ MainWindow::MainWindow(QWidget *parent) :QMainWindow(parent),ui(new Ui::MainWind
     connect(ui->actionFastbootReboot, SIGNAL(triggered()), this->fileWidget->phone, SLOT(fastbootReboot()));
     connect(ui->actionFastbootRebootBootloader, SIGNAL(triggered()), this->fileWidget->phone, SLOT(fastbootRebootBootloader()));
 
-    connect(this->ui->buttonRefresh, SIGNAL(clicked()), this, SLOT(refreshState()));
+ //   connect(this->ui->buttonRefresh, SIGNAL(clicked()), this, SLOT(refreshState()));
 //    connect(this->fileWidget, SIGNAL(phoneConnectionChanged(int)), this, SLOT(phoneConnectionChanged(int)));
 
 //    //tryb
@@ -512,7 +512,7 @@ void MainWindow::phoneConnectionChanged(int state)
         this->fileWidget->computer->procesEvents=true;
 }
 
-void MainWindow::refreshState()
+void MainWindow::on_buttonRefresh_pressed()
 {
     this->fileWidget->phone->slotConnectionChanged(-1,this->fileWidget->phone->serialNumber);
 }
@@ -613,7 +613,7 @@ void MainWindow::showPageDisconnected()
     this->ui->menuAdb->setDisabled(true);
     this->ui->menuFastboot->setDisabled(true);
 
-    this->setButtonDown(4);
+   // this->setButtonDown(4, "Disconnected");
 
 //    this->ui->buttonFiles->hide();
 //    this->ui->buttonRecovery->hide();
@@ -654,7 +654,7 @@ void MainWindow::showPageApps()
 #endif
     }
 
-    this->setButtonDown(1);
+    this->setButtonDown(1, "Apps");
 
     this->startAnimation(this->appWidget);
 }
@@ -669,7 +669,8 @@ void MainWindow::showPageFastboot()
         ui->stackedWidget->addWidget(this->fastbootWidget);
     }
 
-    this->setButtonDown(3);
+    this->setButtonDown(0, "Fastboot");
+
 
     this->startAnimation(this->fastbootWidget);
 }
@@ -679,7 +680,7 @@ void MainWindow::showPageFiles()
     qDebug()<<"showPageFiles";
 
     this->lastCwm = false;
-    this->setButtonDown(0);
+    this->setButtonDown(0, "Files");
 
     this->fileWidget->leftDisplay();
     this->fileWidget->rightDisplay();
@@ -788,7 +789,7 @@ void MainWindow::showPageMessages()
             connect(this->messageWidget, SIGNAL(smsResultSignal(QString)), this, SLOT(smsResult(QString)));
       }
 
-        this->setButtonDown(8);
+        this->setButtonDown(7, "Messages");
 
         qDebug()<<"showPageMessages";
 
@@ -814,7 +815,7 @@ void MainWindow::showPagePhoneInfo()
         ui->stackedWidget->addWidget(this->phoneInfoWidget);
     }
 
-    this->setButtonDown(4);
+    this->setButtonDown(3, "Phone info");
 
     this->startAnimation(this->phoneInfoWidget);
 }
@@ -828,7 +829,7 @@ void MainWindow::showPageRecovery()
         ui->stackedWidget->addWidget(this->recoveryWidget);
     }
 
-    this->setButtonDown(2);
+    this->setButtonDown(3, "Recovery");
 
     this->startAnimation(this->recoveryWidget);
 }
@@ -838,14 +839,17 @@ void MainWindow::showPageCwm()
     if (this->cwmWidget == NULL)
     {
         this->cwmWidget = new CwmWidget;
-        this->settingsWidget->changeFont();
         ui->stackedWidget->addWidget(this->cwmWidget);
     }
+    this->cwmWidget->initial = this->initial;
+    if (this->initial == "No such file")
+        this->cwmWidget->disableCwm();
+
     this->lastCwm = true;
 
     this->cwmWidget->sdcardDisplay();
 
-    this->setButtonDown(2);
+    this->setButtonDown(2, "Advanced");
 
     this->startAnimation(this->cwmWidget);
 }
@@ -860,7 +864,7 @@ void MainWindow::showPageScreenshot()
         ui->stackedWidget->addWidget(this->screenshotWidget);
     }
 
-    this->setButtonDown(5);
+    this->setButtonDown(4, "Screenshot");
 
     this->startAnimation(this->screenshotWidget);
 }
@@ -869,7 +873,7 @@ void MainWindow::showPageSettings()
 {
     qDebug()<<"showPageSettings";
 
-    this->setButtonDown(6);
+    this->setButtonDown(5, "Settings");
 
     this->settingsWidget->setSettings();
 
@@ -892,7 +896,7 @@ void MainWindow::showPageShell()
         this->shellWidget->move(-ui->stackedWidget->currentWidget()->width(),0);
     }
 
-    this->setButtonDown(7);
+    this->setButtonDown(8, "Shell");
 
     this->startAnimation(this->shellWidget);
 }
@@ -1042,11 +1046,11 @@ void MainWindow::changeToolBar()
     this->ui->toolBar->updateGeometry();
 }
 
-void MainWindow::setButtonDown(int number)
+void MainWindow::setButtonDown(int number, QString text)
 {
     for (int i = 0; i < this->akcje.size(); i++)
     {
-        if (i == number)
+        if (this->akcje.at(i).button->text() == text)
             this->akcje.at(i).button->setDown(true);
         else
             this->akcje.at(i).button->setDown(false);
@@ -1086,13 +1090,7 @@ void MainWindow::disableActions(Action::Flags flag)
                 akcje.at(i).actionToolBar->setVisible(true);
             akcje.at(i).button->setEnabled(false);
         }
-        if (this->initial == "No such file" && akcje.at(i).text == "CWM")
-        {
-            akcje.at(i).actionMenu->setEnabled(false);
-            akcje.at(i).actionToolBar->setVisible(false);
-            akcje.at(i).button->setEnabled(false);
-        }
-        else if (this->initial == "extendedcommand" && akcje.at(i).text == "Recovery")
+        if (this->initial == "extendedcommand" && akcje.at(i).text == "Recovery")
         {
             akcje.at(i).actionMenu->setEnabled(false);
             akcje.at(i).actionToolBar->setVisible(false);

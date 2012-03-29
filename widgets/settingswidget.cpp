@@ -60,7 +60,7 @@ SettingsWidget::SettingsWidget(QWidget *parent) :
     connect(this->ui->listWidget, SIGNAL(currentRowChanged(int)), this, SLOT(changePage(int)));
     connect(&this->animation.animation, SIGNAL(finished()), this, SLOT(animationFinished()));
     connect(this->ui->buttonDetectSdExt, SIGNAL(clicked()), this, SLOT(detectSdExtFolder()));
-    connect(this->ui->buttonBrowseFolder, SIGNAL(clicked()), this, SLOT(on_buttonBrowseFolder_pressed()));
+//    connect(this->ui->buttonBrowseFolder, SIGNAL(clicked()), this, SLOT(on_buttonBrowseFolder_pressed()));
 
     connect(this->ui->editBacFolder, SIGNAL(returnPressed()), this, SLOT(appsBackupFolderExists()));
     connect(this->ui->buttonSaveSettings, SIGNAL(clicked()), this, SLOT(appsBackupFolderExists()));

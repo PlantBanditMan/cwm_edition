@@ -85,6 +85,8 @@ CwmWidget::CwmWidget(QWidget *parent) :
 
     this->buttonsEnabled();
 
+    this->settings->changeFont();
+
     currentDir = QDir::currentPath();
     QFont font, fontStatus;
     font.setPointSize(14);
@@ -94,6 +96,9 @@ CwmWidget::CwmWidget(QWidget *parent) :
     this->ui->label->setFont(font);
     this->ui->plainTextEditStatus->setFont(fontStatus);
     this->ui->label_2->setFont(fontStatus);
+
+    if (this->initial == "No such file")
+        this->disableCwm();
 }
 
 CwmWidget::~CwmWidget()
@@ -106,7 +111,7 @@ CwmWidget::~CwmWidget()
 
 void CwmWidget::setTabCreate(int i)
 {
-    if (i == 2)
+    if (i == 2 || i == 4)
         if (this->ui->tabWidget->currentIndex() > 1)
             this->ui->tabWidget->setCurrentWidget(this->ui->tabSdcardPart);
 }
@@ -114,7 +119,7 @@ void CwmWidget::setTabCreate(int i)
 void CwmWidget::setTabFix(int i)
 {
     if (i > 1)
-        if (this->ui->tabWidget_3->currentIndex() == 2)
+        if (this->ui->tabWidget_3->currentIndex() == 2 || this->ui->tabWidget_3->currentIndex() == 4)
             this->ui->tabWidget_3->setCurrentWidget(this->ui->tabPermissions);
 }
 
@@ -157,6 +162,7 @@ void CwmWidget::connectSignals()
     connect(this->ui->checkBacSystem, SIGNAL(toggled(bool)),this,SLOT(buttonsEnabled()));
     connect(this->ui->checkAfter, SIGNAL(toggled(bool)),this,SLOT(checkFlash()));
     connect(this->ui->checkBefore, SIGNAL(toggled(bool)),this,SLOT(checkFlash()));
+    connect(this->ui->lineScript, SIGNAL(textChanged(QString)),this,SLOT(buttonsEnabled()));
 }
 
 void CwmWidget::disconnectSignals()
@@ -183,7 +189,7 @@ void CwmWidget::disconnectSignals()
     disconnect(this->ui->checkCache, SIGNAL(toggled(bool)),this,SLOT(buttonsEnabled()));
     disconnect(this->ui->checkBattery, SIGNAL(toggled(bool)),this,SLOT(buttonsEnabled()));
     disconnect(this->ui->checkDefaultBackupDir, SIGNAL(toggled(bool)),this,SLOT(buttonsEnabled()));
-    connect(this->ui->checkDefaultBackupDir, SIGNAL(toggled(bool)),this,SLOT(lineBackupClear()));
+    disconnect(this->ui->checkDefaultBackupDir, SIGNAL(toggled(bool)),this,SLOT(lineBackupClear()));
     disconnect(this->ui->radioUpdateZip, SIGNAL(toggled(bool)),this,SLOT(buttonsEnabled()));
     disconnect(this->ui->radioInstallPath, SIGNAL(toggled(bool)),this,SLOT(buttonsEnabled()));
     disconnect(this->ui->lineBackup, SIGNAL(textChanged(QString)),this,SLOT(buttonsEnabled()));
@@ -198,6 +204,7 @@ void CwmWidget::disconnectSignals()
     disconnect(this->ui->checkBacSystem, SIGNAL(toggled(bool)),this,SLOT(buttonsEnabled()));
     disconnect(this->ui->checkAfter, SIGNAL(toggled(bool)),this,SLOT(checkFlash()));
     disconnect(this->ui->checkBefore, SIGNAL(toggled(bool)),this,SLOT(checkFlash()));
+    disconnect(this->ui->lineScript, SIGNAL(textChanged(QString)),this,SLOT(buttonsEnabled()));
 }
 
 //void CwmWidget::mousePressEvent(QMouseEvent *event)
@@ -639,26 +646,28 @@ void CwmWidget::on_buttonFixPermissions_pressed()
 
 void CwmWidget::printProcess(QString processOut)
 {
-     int i;
-     for (i = 0; i < processOut.length(); i++)
-     {
-          if (processOut.at(i).unicode() == 13)
-              processOut[i] = ' ';
-          if (processOut.at(i).unicode() == 10)
-              processOut[i] = '\n';
-     }
-     if (processOut.contains(QChar( 0x1b ), Qt::CaseInsensitive))
-     {
-         processOut.remove("[0m");
-         processOut.remove(QChar( 0x1b ), Qt::CaseInsensitive);
-         processOut.remove(QRegExp("\\[\\d;\\d+m"));
-         this->ui->plainTextEditStatus->insertPlainText(processOut);
-      }
-      else
-      {
-         this->ui->plainTextEditStatus->insertPlainText(processOut);
-      }
-      this->ui->plainTextEditStatus->ensureCursorVisible();
+    QFont fontStatus;
+    fontStatus.setPointSize(10);
+    fontStatus.setBold(true);
+    this->ui->plainTextEditStatus->setFont(fontStatus);
+    int i;
+    for (i = 0; i < processOut.length(); i++)
+    {
+         if (processOut.at(i).unicode() == 13)
+             processOut[i] = ' ';
+         if (processOut.at(i).unicode() == 10)
+             processOut[i] = '\n';
+    }
+    if (processOut.contains(QChar( 0x1b ), Qt::CaseInsensitive))
+    {
+        processOut.remove("[0m");
+        processOut.remove(QChar( 0x1b ), Qt::CaseInsensitive);
+        processOut.remove(QRegExp("\\[\\d;\\d+m"));
+        this->ui->plainTextEditStatus->insertPlainText(processOut);
+    }
+    else
+        this->ui->plainTextEditStatus->insertPlainText(processOut);
+    this->ui->plainTextEditStatus->ensureCursorVisible();
 }
 
 void CwmWidget::readFromProcess()
@@ -693,6 +702,8 @@ void CwmWidget::buttonsDisabled()
     this->ui->checkAfter->setDisabled(true);
     this->ui->checkBefore->setDisabled(true);
     this->ui->buttonFixMarket->setDisabled(true);
+    this->ui->buttonBrowse->setDisabled(true);
+    this->ui->buttonRun->setDisabled(true);
 }
 
 QString CwmWidget::adbPushTool(QString toolName)
@@ -927,6 +938,8 @@ void CwmWidget::buttonsEnabled()
     this->ui->labelAfter->setEnabled(false);
     this->ui->buttonFixMarket->setDisabled(false);
     this->ui->buttonRecovery->setEnabled(false);
+    this->ui->buttonRun->setDisabled(true);
+    this->ui->buttonBrowse->setDisabled(false);
     if (this->ui->radio128->isChecked())
         this->ui->buttonCreate->setEnabled(true);
     if (this->ui->radio256->isChecked())
@@ -1047,6 +1060,8 @@ void CwmWidget::buttonsEnabled()
                 this->ui->checkLink2Sd->setText("Link2SD not detected.");
         }
     }
+    if (!this->ui->lineScript->text().isEmpty())
+        this->ui->buttonRun->setEnabled(true);
 }
 
 void CwmWidget::on_buttonSdinfo_pressed()
@@ -1239,6 +1254,13 @@ void CwmWidget::on_buttonInsert_pressed()
             else
                 QMessageBox::information(this,"Insert Selection:",tr("Valid IMG file must be selected!"));
         }
+        if (this->ui->tabWidget_3->currentIndex() == 4)
+        {
+            if (itemPath.startsWith("/sdcard/") && itemType == "file")
+                this ->ui->lineScript->setText(itemPath);
+            else
+                QMessageBox::information(this,"Insert Selection:",tr("Select Script to Run!"));
+        }
     }
 }
 
@@ -1320,6 +1342,17 @@ void CwmWidget::activateButtonInsert()
         if (this->ui->tabWidget_3->currentIndex() == 2)
         {
             if (itemPath.startsWith("/sdcard/") && itemType == "file" && itemPath.endsWith(".img"))
+            {
+                this ->ui->buttonInsert->setEnabled(true);
+            }
+            else
+            {
+                this ->ui->buttonInsert->setEnabled(false);
+            }
+        }
+        if (this->ui->tabWidget_3->currentIndex() == 4)
+        {
+            if (itemPath.startsWith("/sdcard/") && itemType == "file")
             {
                 this ->ui->buttonInsert->setEnabled(true);
             }
@@ -1416,10 +1449,11 @@ void CwmWidget::on_buttonRestore_pressed()
 void ThreadSdcard::run()
 {
     QProcess sd;
+    QTextCodec *codec = QTextCodec::codecForLocale();
     do
     {
         this->sleep(5);
-        sd.start("\""+this->sdk+"\"" + "adb shell busybox find \"" + this->backupPath + "\"");
+        sd.start("\""+this->sdk+"\"" + "adb shell busybox find \"" + codec->toUnicode(this->backupPath.toUtf8()) + "\"");
         sd.waitForFinished(-1);
         QString outsd = sd.readAll();
         if (!outsd.contains("No such file"))
@@ -1508,7 +1542,7 @@ void CwmWidget::backupAvailable()
         this->ui->plainTextEditStatus->insertPlainText("---------------------------\n");
         this->ui->tabWidget_2->setCurrentIndex(1);
         this->adbPushTool("domd5sum.sh");
-        processWhich->start("\""+sdk+"\"" + "adb shell busybox /cache/qtadb/domd5sum.sh \"" + this->threadSdcard->backupPath + "\"" );
+        processWhich->start("\""+sdk+"\"" + "adb shell busybox /cache/qtadb/domd5sum.sh \"" + codec->toUnicode(this->threadSdcard->backupPath.toUtf8()) + "\"" );
         processWhich->waitForReadyRead(-1);
     }
     else if (which == "fix market")
@@ -1745,6 +1779,7 @@ void CwmWidget::mountsEnable()
     this->ui->buttonSystem->setEnabled(true);
     this->ui->buttonSdext->setEnabled(true);
     this->ui->buttonSdcard->setEnabled(true);
+    this->inRecovery();
 }
 
 void CwmWidget::mountsDisable()
@@ -1753,6 +1788,9 @@ void CwmWidget::mountsDisable()
     this->ui->buttonData->setEnabled(false);
     this->ui->buttonSdext->setEnabled(false);
     this->ui->buttonSdcard->setEnabled(false);
+    this->inDevice();
+    if (this->initial == "No such file")
+        this->disableCwm();
 }
 
 void CwmWidget::mountsUpdate()
@@ -1881,4 +1919,108 @@ void CwmWidget::fixMarket()
     this->processStarted();
     process->start("\"" + sdk + "\"" + "adb shell " + market);
     process->waitForReadyRead(-1);
+}
+
+void CwmWidget::on_buttonBrowse_pressed()
+{
+    QDir file;
+    QString script=QFileDialog::getOpenFileName(NULL,QObject::tr("Choose Script to Run..."),file.path());
+
+    if (script.isEmpty())
+        return;
+    this->ui->lineScript->setText(script.replace("/","\\"));
+}
+
+void CwmWidget::on_buttonRun_pressed()
+{
+    QString script = this->ui->lineScript->text();
+    if (QMessageBox::question(this, tr("Run Script:"),"Are you sure you want to run\n\"" + script + "\"?",QMessageBox::Yes | QMessageBox::No) == QMessageBox::No)
+        return;
+    processFind->start("\""+this->sdk+"\""+"adb shell busybox mkdir -p /cache/qtadb");
+    processFind->waitForFinished(-1);
+    this->processStarted();
+    commandRunning = "Not Running";
+    if (script.startsWith("/sdcard/"))
+    {
+        processFind->start("\""+this->sdk+"\""+"adb shell busybox cp \""+ this->codec->toUnicode(script.toUtf8()) + "\" /cache/qtadb/script.sh");
+        processFind->waitForFinished(-1);
+    }
+    else
+    {
+        processFind->start("\""+this->sdk+"\""+"adb push \""+ script + "\" /cache/qtadb/script.sh");
+        processFind->waitForFinished(-1);
+    }
+    processFind->start("\""+this->sdk+"\""+"adb shell busybox chmod 777 /cache/qtadb/script.sh");
+    processFind->waitForFinished(-1);
+    process->start("\""+sdk+"\"" + "adb shell su -c 'sh /cache/qtadb/script.sh'");
+    process->waitForReadyRead(-1);
+}
+
+void CwmWidget::disableCwm()
+{
+    this->ui->tabSdcardPart->setDisabled(true);
+    this->ui->tabWipe->setDisabled(true);
+    this->ui->tab_2->setDisabled(true);
+    this->ui->tab_3->setDisabled(true);
+    this->ui->tab_4->setDisabled(true);
+    this->ui->tab_5->setDisabled(true);
+    this->ui->tab_6->setDisabled(true);
+    this->ui->label_2->setText("<font color=\"red\">~~~ CWM Recovery Not Detected... Functions Disabled! ~~~</font>");
+    this->ui->label_2->setAlignment(Qt::AlignHCenter);
+    QFont fontStatus;
+    fontStatus.setPointSize(10);
+    fontStatus.setBold(true);
+    this->ui->label_2->setFont(fontStatus);
+}
+
+void CwmWidget::inRecovery()
+{
+    this->ui->tabPermissions->setDisabled(true);
+    this->ui->tabMarket->setDisabled(true);
+    this->ui->tabRecovery->setDisabled(true);
+    this->ui->tabScript->setDisabled(true);
+    this->ui->tabWidget_3->setCurrentIndex(3);
+    this->ui->tabSdcardPart->setDisabled(true);
+    this->ui->tabWipe->setDisabled(true);
+    this->ui->tab_2->setDisabled(true);
+    this->ui->tab_3->setDisabled(true);
+    this->ui->tab_4->setDisabled(true);
+    this->ui->tab_5->setDisabled(true);
+    this->ui->tab_6->setDisabled(true);
+    this->ui->label_12->setDisabled(true);
+    if (this->initial == "extendedcommand")
+    {
+        this->ui->label_2->setText("<font color=\"red\">~~~ Functions Disabled in Recovery Mode! ~~~</font>");
+        this->ui->label_2->setAlignment(Qt::AlignHCenter);
+        QFont fontStatus;
+        fontStatus.setPointSize(10);
+        fontStatus.setBold(true);
+        this->ui->label_2->setFont(fontStatus);
+    }
+}
+
+void CwmWidget::inDevice()
+{
+    this->ui->tabPermissions->setDisabled(false);
+    this->ui->tabMarket->setDisabled(false);
+    this->ui->tabRecovery->setDisabled(false);
+    this->ui->tabScript->setDisabled(false);
+    this->ui->tabWidget_3->setCurrentIndex(0);
+    this->ui->tabSdcardPart->setDisabled(false);
+    this->ui->tabWipe->setDisabled(false);
+    this->ui->tab_2->setDisabled(false);
+    this->ui->tab_3->setDisabled(false);
+    this->ui->tab_4->setDisabled(false);
+    this->ui->tab_5->setDisabled(false);
+    this->ui->tab_6->setDisabled(false);
+    this->ui->label_12->setDisabled(false);
+    if (this->initial == "extendedcommand")
+    {
+        this->ui->label_2->setText("<font color=\"red\">~~~ COUTION!!! All your data on SD Card will be destroyed!!! ~~~</font>");
+        this->ui->label_2->setAlignment(Qt::AlignHCenter);
+        QFont fontStatus;
+        fontStatus.setPointSize(10);
+        fontStatus.setBold(true);
+        this->ui->label_2->setFont(fontStatus);
+    }
 }

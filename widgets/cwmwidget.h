@@ -66,6 +66,7 @@ public:
     FileSortModel *phoneSortModel;
     MyTableView *sdcardTableView;
     QTextCodec *codec;
+    QString initial;
 
 protected:
    // void mousePressEvent(QMouseEvent *e);
@@ -91,6 +92,7 @@ private:
 
 public slots:
     void sdcardDisplay();
+    void disableCwm();
 
 private slots:
     void lineBackupClear();
@@ -150,6 +152,10 @@ private slots:
     void on_buttonSdext_pressed();
     void on_buttonSdcard_pressed();
     void fixMarket();
+    void on_buttonBrowse_pressed();
+    void on_buttonRun_pressed();
+    void inRecovery();
+    void inDevice();
 
 signals:
     void phoneConnectionChanged(int);
