@@ -46,10 +46,10 @@ private:
     Phone *phone;
 
 private slots:
-    void flashSPL();
-    void flashRecovery();
-    void flashRadio();
-    void bootIMG();
+    void on_buttonFlashSPL_pressed();
+    void on_buttonFlashRadio_pressed();
+    void on_buttonFlashRecovery_pressed();
+    void on_buttonBootIMG_pressed();
 };
 
 #endif // FASTBOOTWIDGET_H

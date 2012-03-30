@@ -96,7 +96,7 @@ MainWindow::MainWindow(QWidget *parent) :QMainWindow(parent),ui(new Ui::MainWind
 
     this->addButton(QIcon(":icons/files.png"), tr("Files", "files button"), "Files" , SLOT(showPageFiles()), Action::Device | Action::Recovery);
     this->addButton(QIcon(":icons/apps.png"), tr("Apps", "apps button"), "Apps", SLOT(showPageApps()), Action::Device | Action::Recovery);
-    this->addButton(QIcon(":icons/recovery.png"), tr("Advanced", "cwm button"), "Advanced", SLOT(showPageCwm()), Action::Device | Action::Recovery);
+    this->addButton(QIcon(":icons/advanced.png"), tr("Advanced", "cwm button"), "Advanced", SLOT(showPageCwm()), Action::Device | Action::Recovery);
     this->addButton(QIcon(":icons/recovery.png"), tr("Recovery", "recovery button"), "Recovery", SLOT(showPageRecovery()), Action::Recovery);
     this->addButton(QIcon(":icons/fastboot.png"), tr("Fastboot", "fastbot button"), "Fastboot", SLOT(showPageFastboot()), Action::Fastboot);
     this->addButton(QIcon(":icons/info.png"), tr("Phone info", "phone info button"), "Phone info", SLOT(showPagePhoneInfo()), Action::Device | Action::Recovery | Action::Disconnected | Action::Fastboot);
@@ -661,7 +661,6 @@ void MainWindow::showPageApps()
 
 void MainWindow::showPageFastboot()
 {
-
     if (this->fastbootWidget == NULL)
     {
         this->fastbootWidget = new FastbootWidget(this,this->fileWidget->phone);

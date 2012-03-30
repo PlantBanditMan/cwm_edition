@@ -62,9 +62,13 @@ int main(int argc, char *argv[])
 {
     QCoreApplication::setOrganizationName("Bracia");
     QCoreApplication::setApplicationName("QtADB");
-    QCoreApplication::setApplicationVersion("0.8.6_cwm_edition");
+    QCoreApplication::setApplicationVersion("0.8.7_cwm_edition");
     QCoreApplication::setOrganizationDomain("http://qtadb.com");
     Application a(argc, argv);
+    QPixmap pixmap(":icons/splash.png");
+    QSplashScreen splash(pixmap);
+    splash.setMask(pixmap.mask());
+    splash.show();
     qInstallMsgHandler(myMessageHandler);
     a.loadTranslations(":/lang");
     a.loadTranslations(qApp->applicationDirPath());
@@ -88,7 +92,6 @@ int main(int argc, char *argv[])
     QSettings settings;
     QString sdk;
     sdk = settings.value("sdkPath").toString();
-
 
     QString locale = QLocale::system().name().left(2);
 
@@ -216,7 +219,6 @@ int main(int argc, char *argv[])
                 settings.setValue("disableProductionBuildsMessage",true);
             }
         }
-
         QStringList args = qApp->arguments();
         if (args.count() > 1)
         {
@@ -255,6 +257,10 @@ int main(int argc, char *argv[])
         }
         MainWindow w;
         w.show();
+
+        splash.finish(&w);
+
+
         return a.exec();
     }
     else{

@@ -33,10 +33,10 @@ FastbootWidget::FastbootWidget(QWidget *parent,Phone *phone) :
     QSettings settings;
     this->sdk=settings.value("sdkPath").toString();
 
-    connect(this->ui->buttonBootIMG, SIGNAL(clicked()), this, SLOT(bootIMG()));
-    connect(this->ui->buttonFlashRadio, SIGNAL(clicked()), this, SLOT(flashRadio()));
-    connect(this->ui->buttonFlashRecovery, SIGNAL(clicked()), this, SLOT(flashRecovery()));
-    connect(this->ui->buttonFlashSPL, SIGNAL(clicked()), this, SLOT(flashSPL()));
+//    connect(this->ui->buttonBootIMG, SIGNAL(clicked()), this, SLOT(bootIMG()));
+//    connect(this->ui->buttonFlashRadio, SIGNAL(clicked()), this, SLOT(flashRadio()));
+//    connect(this->ui->buttonFlashRecovery, SIGNAL(clicked()), this, SLOT(flashRecovery()));
+//    connect(this->ui->buttonFlashSPL, SIGNAL(clicked()), this, SLOT(flashSPL()));
 }
 
 FastbootWidget::~FastbootWidget()
@@ -56,7 +56,7 @@ FastbootWidget::~FastbootWidget()
 //    }
 //}
 
-void FastbootWidget::bootIMG()
+void FastbootWidget::on_buttonBootIMG_pressed()
 {
     QString output;
     QProcess fastboot;
@@ -72,7 +72,7 @@ void FastbootWidget::bootIMG()
         QString imgFileName = QFileDialog::getOpenFileName(this, tr("Choose img file..."), ".", tr("IMG File ")+"(*.img)");
         if (!imgFileName.isEmpty())
         {
-            process->start("\"" + sdk + "\"fastboot boot " + imgFileName);
+            process->start("\"" + sdk + "\"fastboot boot \"" + imgFileName + "\"");
             process->waitForFinished(-1);
             process->terminate();
         }
@@ -86,7 +86,7 @@ void FastbootWidget::bootIMG()
     }
 }
 
-void FastbootWidget::flashSPL()
+void FastbootWidget::on_buttonFlashSPL_pressed()
 {
     QString output;
     QProcess fastboot;
@@ -102,7 +102,7 @@ void FastbootWidget::flashSPL()
         QString imgFileName = QFileDialog::getOpenFileName(this, tr("Choose hboot img file..."), ".", tr("IMG File ")+"(*.img)");
         if (!imgFileName.isEmpty())
         {
-            process->start("\"" + sdk + "\"fastboot flash hboot " + imgFileName);
+            process->start("\"" + sdk + "\"fastboot flash hboot \"" + imgFileName + "\"");
             process->waitForFinished(-1);
             tmp = process->readAll();
             if (tmp.contains("error"))
@@ -121,7 +121,7 @@ void FastbootWidget::flashSPL()
     }
 }
 
-void FastbootWidget::flashRadio()
+void FastbootWidget::on_buttonFlashRadio_pressed()
 {
     QString output;
     QProcess fastboot;
@@ -137,7 +137,7 @@ void FastbootWidget::flashRadio()
         QString imgFileName = QFileDialog::getOpenFileName(this, tr("Choose radio img file..."), ".", tr("IMG File ")+"(*.img)");
         if (!imgFileName.isEmpty())
         {
-            process->start("\"" + sdk + "\"fastboot flash radio " + imgFileName);
+            process->start("\"" + sdk + "\"fastboot flash radio \"" + imgFileName + "\"");
             process->waitForFinished(-1);
             tmp = process->readAll();
             if (tmp.contains("error"))
@@ -156,7 +156,7 @@ void FastbootWidget::flashRadio()
     }
 }
 
-void FastbootWidget::flashRecovery()
+void FastbootWidget::on_buttonFlashRecovery_pressed()
 {
     QString output;
     QProcess fastboot;
@@ -172,7 +172,7 @@ void FastbootWidget::flashRecovery()
         QString imgFileName = QFileDialog::getOpenFileName(this, tr("Choose recovery img file..."), ".", tr("IMG File ")+"(*.img)");
         if (!imgFileName.isEmpty())
         {
-            process->start("\"" + sdk + "\"fastboot flash recovery " + imgFileName);
+            process->start("\"" + sdk + "\"fastboot flash recovery \"" + imgFileName + "\"");
             process->waitForFinished(-1);
             tmp = process->readAll();
             if (tmp.contains("error"))

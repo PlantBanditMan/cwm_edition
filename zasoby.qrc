@@ -35,6 +35,8 @@
         <file alias="contactDefault.png">images/contactDefault.png</file>
         <file alias="appBrain.png">images/appBrain.png</file>
         <file alias="logcat.png">images/logcat.png</file>
+        <file alias="advanced.png">images/advanced.png</file>
+        <file alias="splash.png">images/splash.png</file>
         <file>images/help.png</file>
     </qresource>
     <qresource prefix="/lang">

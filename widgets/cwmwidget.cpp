@@ -111,7 +111,7 @@ CwmWidget::~CwmWidget()
 
 void CwmWidget::setTabCreate(int i)
 {
-    if (i == 2 || i == 4)
+    if (i > 2)
         if (this->ui->tabWidget->currentIndex() > 1)
             this->ui->tabWidget->setCurrentWidget(this->ui->tabSdcardPart);
 }
@@ -119,8 +119,8 @@ void CwmWidget::setTabCreate(int i)
 void CwmWidget::setTabFix(int i)
 {
     if (i > 1)
-        if (this->ui->tabWidget_3->currentIndex() == 2 || this->ui->tabWidget_3->currentIndex() == 4)
-            this->ui->tabWidget_3->setCurrentWidget(this->ui->tabPermissions);
+        if (this->ui->tabWidget_3->currentIndex() > 2)
+            this->ui->tabWidget_3->setCurrentWidget(this->ui->tabMounts);
 }
 
 void CwmWidget::connectSignals()
@@ -708,6 +708,8 @@ void CwmWidget::buttonsDisabled()
 
 QString CwmWidget::adbPushTool(QString toolName)
 {
+    processFind->start("\""+this->sdk+"\""+"adb shell busybox mkdir -p /cache/qtadb");
+    processFind->waitForFinished(-1);
     disconnect(ui->tabWidget_2,SIGNAL(currentChanged(int)),this,SLOT(sdcardDisplay()));
     processFind->start("\""+this->sdk+"\""+"adb push \""+QDir::currentPath()+"/tools/" + toolName + "\" /cache/qtadb/"+ toolName);
     processFind->waitForFinished(-1);
@@ -1021,7 +1023,7 @@ void CwmWidget::buttonsEnabled()
         this->ui->labelBefore->setEnabled(true);
         this->ui->labelAfter->setEnabled(true);
     }
-    if (this->ui->tabWidget_3->currentIndex() == 1)
+    if (this->ui->tabWidget_3->currentIndex() == 2)
     {
         QProcess down;
         down.start("\"" + sdk + "\"" + "adb shell busybox ls -l /cache/download");
@@ -1247,14 +1249,14 @@ void CwmWidget::on_buttonInsert_pressed()
             else
                 QMessageBox::information(this,"Insert Selection:",tr("Valid ROM file must be selected!"));
         }
-        if (this->ui->tabWidget_3->currentIndex() == 2)
+        if (this->ui->tabWidget_3->currentIndex() == 4)
         {
             if (itemPath.startsWith("/sdcard/") && itemType == "file" && itemPath.endsWith(".img"))
                 this ->ui->lineRecovery->setText(itemPath);
             else
                 QMessageBox::information(this,"Insert Selection:",tr("Valid IMG file must be selected!"));
         }
-        if (this->ui->tabWidget_3->currentIndex() == 4)
+        if (this->ui->tabWidget_3->currentIndex() == 3)
         {
             if (itemPath.startsWith("/sdcard/") && itemType == "file")
                 this ->ui->lineScript->setText(itemPath);
@@ -1339,7 +1341,7 @@ void CwmWidget::activateButtonInsert()
                 this ->ui->buttonInsert->setEnabled(false);
             }
         }
-        if (this->ui->tabWidget_3->currentIndex() == 2)
+        if (this->ui->tabWidget_3->currentIndex() == 4)
         {
             if (itemPath.startsWith("/sdcard/") && itemType == "file" && itemPath.endsWith(".img"))
             {
@@ -1350,7 +1352,7 @@ void CwmWidget::activateButtonInsert()
                 this ->ui->buttonInsert->setEnabled(false);
             }
         }
-        if (this->ui->tabWidget_3->currentIndex() == 4)
+        if (this->ui->tabWidget_3->currentIndex() == 3)
         {
             if (itemPath.startsWith("/sdcard/") && itemType == "file")
             {
@@ -1795,7 +1797,7 @@ void CwmWidget::mountsDisable()
 
 void CwmWidget::mountsUpdate()
 {
-    if (this->ui->tabWidget_3->currentIndex() == 3)
+    if (this->ui->tabWidget_3->currentIndex() == 0)
     {
         QProcess df;
         df.start("\""+sdk+"\"" + "adb shell busybox df");
@@ -1979,7 +1981,7 @@ void CwmWidget::inRecovery()
     this->ui->tabMarket->setDisabled(true);
     this->ui->tabRecovery->setDisabled(true);
     this->ui->tabScript->setDisabled(true);
-    this->ui->tabWidget_3->setCurrentIndex(3);
+    this->ui->tabWidget_3->setCurrentIndex(0);
     this->ui->tabSdcardPart->setDisabled(true);
     this->ui->tabWipe->setDisabled(true);
     this->ui->tab_2->setDisabled(true);
@@ -2005,7 +2007,6 @@ void CwmWidget::inDevice()
     this->ui->tabMarket->setDisabled(false);
     this->ui->tabRecovery->setDisabled(false);
     this->ui->tabScript->setDisabled(false);
-    this->ui->tabWidget_3->setCurrentIndex(0);
     this->ui->tabSdcardPart->setDisabled(false);
     this->ui->tabWipe->setDisabled(false);
     this->ui->tab_2->setDisabled(false);
