@@ -1,4 +1,10 @@
 
+4/4/2012
+-enabled "Flash ROM" in recovery mode, useful for unbricking some devices;
+-some code optimization;
+
+
+
 3/29/2012 
 -improved /system remount behavior;
 -CWM Page renamed to Advanced and some of its generic functions are enabled even if CWM Recovery is not detected;

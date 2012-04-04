@@ -169,7 +169,7 @@ void CwmWidget::disconnectSignals()
 {
     disconnect(ui->lineEditPath,SIGNAL(returnPressed()),this,SLOT(sdcardLineEdit()));
     disconnect(ui->lineEditPath, SIGNAL(editingFinished ()), this, SLOT(sdcardLineEdit()));
-    disconnect(ui->tabWidget_2,SIGNAL(currentChanged(int)),this,SLOT(sdcardDisplay()));
+  //  disconnect(ui->tabWidget_2,SIGNAL(currentChanged(int)),this,SLOT(sdcardDisplay()));
     disconnect(ui->tabWidget,SIGNAL(currentChanged(int)),this,SLOT(activateButtonInsert()));
     disconnect(ui->tabWidget,SIGNAL(currentChanged(int)),this,SLOT(buttonsEnabled()));
     disconnect(ui->tabWidget,SIGNAL(currentChanged(int)),this,SLOT(setTabFix(int)));
@@ -246,9 +246,8 @@ void CwmWidget::connectionChanged()
     else if (this->phone->getConnectionState() == RECOVERY)
     {
         emit this->phoneConnectionChanged(RECOVERY);
-        disconnectSignals();
+        //disconnectSignals();
         mountsEnable();
-        mountsUpdate();
         this->ui->tabWidget_2->setCurrentIndex(1);
         this->buttonsDisabled();
         QFont font, fontStatus;
@@ -265,10 +264,9 @@ void CwmWidget::connectionChanged()
             }
             tailLog();
         }
-
-
-
-           // QTimer::singleShot(2000, this, SLOT(tailLog()));
+        processFind->start("\""+sdk+"\"" + "adb shell mount /sdcard");
+        processFind->waitForFinished(-1);
+        mountsUpdate();
     }
     else if (this->phone->getConnectionState() == FASTBOOT)
     {
@@ -531,7 +529,6 @@ void CwmWidget::propsDialog()
 
 void CwmWidget::processFinished()
 {
-    connect(ui->tabWidget_2,SIGNAL(currentChanged(int)),this,SLOT(sdcardDisplay()));
     processFind->start("\""+this->sdk+"\""+"adb shell busybox rm -r /cache/qtadb/");
     processFind->waitForFinished(-1);
     ui->plainTextEditStatus->setStyleSheet( "QPlainTextEdit {background-color:black;color:lightgreen;border: 1px solid #020202;border-radius: 1px;}" );
@@ -622,25 +619,15 @@ void CwmWidget::finishedWhich()
 void CwmWidget::on_buttonFixPermissions_pressed()
 {
     which = "fix permissions";
+    commandRunning = "Not Running";
+    this->processStarted();
     QString tool = "/system/bin/fix_permissions";
     processFind->start("\""+sdk+"\"" + "adb shell busybox find " + tool);
     processFind->waitForFinished(-1);
     QString outputFind = processFind->readAll();
     if (outputFind.contains("No such file"))
-    {
-        tool = "/system/xbin/fix_permissions";
-        processFind->start("\""+sdk+"\"" + "adb shell busybox find " + tool);
-        processFind->waitForFinished(-1);
-        outputFind = processFind->readAll();
-        if (outputFind.contains("No such file"))
-        {
-          tool = this->adbPushTool("fix_permissions");
-        }
-    }
-    commandRunning = "Not Running";
-    this->processStarted();
-    QString commandFixPerm="\""+sdk+"\"" + "adb shell su -c '" + tool + "'";
-    process->start(commandFixPerm);
+        tool = this->adbPushTool("fix_permissions");
+    process->start("\""+sdk+"\"" + "adb shell su -c '" + tool + "'");
     process->waitForReadyRead(-1);
 }
 
@@ -693,7 +680,7 @@ void CwmWidget::buttonsDisabled()
     this->ui->buttonRestore->setDisabled(true);
     this->ui->buttonUpdate->setDisabled(true);
     this->ui->buttonFlash->setDisabled(true);
-    this->ui->tabWidget_2->setTabEnabled(0,false);
+  //  this->ui->tabWidget_2->setTabEnabled(0,false);
     this->ui->checkBacBoot->setDisabled(true);
     this->ui->checkBacCache->setDisabled(true);
     this->ui->checkBacData->setDisabled(true);
@@ -710,7 +697,7 @@ QString CwmWidget::adbPushTool(QString toolName)
 {
     processFind->start("\""+this->sdk+"\""+"adb shell busybox mkdir -p /cache/qtadb");
     processFind->waitForFinished(-1);
-    disconnect(ui->tabWidget_2,SIGNAL(currentChanged(int)),this,SLOT(sdcardDisplay()));
+  //  disconnect(ui->tabWidget_2,SIGNAL(currentChanged(int)),this,SLOT(sdcardDisplay()));
     processFind->start("\""+this->sdk+"\""+"adb push \""+QDir::currentPath()+"/tools/" + toolName + "\" /cache/qtadb/"+ toolName);
     processFind->waitForFinished(-1);
     processFind->start("\""+this->sdk+"\""+"adb shell busybox chmod 755 /cache/qtadb/" + toolName);
@@ -924,7 +911,7 @@ void CwmWidget::buttonsEnabled()
     this->ui->checkAfter->setDisabled(false);
     this->ui->checkBefore->setDisabled(false);
     this->ui->buttonFixPermissions->setEnabled(true);
-    this->ui->tabWidget_2->setTabEnabled(0,true);
+  //  this->ui->tabWidget_2->setTabEnabled(0,true);
     this->ui->buttonCreate->setDisabled(true);
     this->ui->buttonWipe->setDisabled(true);
     this->ui->checkCache->setDisabled(false);
@@ -1988,11 +1975,11 @@ void CwmWidget::inRecovery()
     this->ui->tab_3->setDisabled(true);
     this->ui->tab_4->setDisabled(true);
     this->ui->tab_5->setDisabled(true);
-    this->ui->tab_6->setDisabled(true);
+   // this->ui->tab_6->setDisabled(true);
     this->ui->label_12->setDisabled(true);
     if (this->initial == "extendedcommand")
     {
-        this->ui->label_2->setText("<font color=\"red\">~~~ Functions Disabled in Recovery Mode! ~~~</font>");
+        this->ui->label_2->setText("<font color=\"red\">~~~ Some Functions Disabled in Recovery Mode! Flash ROM Enabled ~~~</font>");
         this->ui->label_2->setAlignment(Qt::AlignHCenter);
         QFont fontStatus;
         fontStatus.setPointSize(10);
@@ -2013,7 +2000,7 @@ void CwmWidget::inDevice()
     this->ui->tab_3->setDisabled(false);
     this->ui->tab_4->setDisabled(false);
     this->ui->tab_5->setDisabled(false);
-    this->ui->tab_6->setDisabled(false);
+   // this->ui->tab_6->setDisabled(false);
     this->ui->label_12->setDisabled(false);
     if (this->initial == "extendedcommand")
     {
