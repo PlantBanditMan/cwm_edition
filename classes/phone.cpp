@@ -881,7 +881,7 @@ void Phone::adbReboot()
 void Phone::adbRebootBootloader()
 {
     QProcess *reboot=new QProcess();
-    reboot->start("\""+sdk+"\"adb shell reboot bootloader");
+    reboot->start("\""+sdk+"\"adb reboot-bootloader");
     reboot->waitForFinished(-1);
     reboot->terminate();
     delete reboot;
