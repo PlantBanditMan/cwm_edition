@@ -169,7 +169,7 @@ void CwmWidget::disconnectSignals()
 {
     disconnect(ui->lineEditPath,SIGNAL(returnPressed()),this,SLOT(sdcardLineEdit()));
     disconnect(ui->lineEditPath, SIGNAL(editingFinished ()), this, SLOT(sdcardLineEdit()));
-  //  disconnect(ui->tabWidget_2,SIGNAL(currentChanged(int)),this,SLOT(sdcardDisplay()));
+    disconnect(ui->tabWidget_2,SIGNAL(currentChanged(int)),this,SLOT(sdcardDisplay()));
     disconnect(ui->tabWidget,SIGNAL(currentChanged(int)),this,SLOT(activateButtonInsert()));
     disconnect(ui->tabWidget,SIGNAL(currentChanged(int)),this,SLOT(buttonsEnabled()));
     disconnect(ui->tabWidget,SIGNAL(currentChanged(int)),this,SLOT(setTabFix(int)));
@@ -234,6 +234,7 @@ void CwmWidget::connectionChanged()
         fontStatus.setBold(true);
         this->ui->label->setFont(font);
         this->ui->plainTextEditStatus->setFont(fontStatus);
+        this->ui->tabWidget_2->setTabEnabled(0,true);
         if (readLog == "read")
         {
             readLog = "Not Read";
@@ -257,11 +258,15 @@ void CwmWidget::connectionChanged()
         fontStatus.setBold(true);
         this->ui->label->setFont(font);
         this->ui->plainTextEditStatus->setFont(fontStatus);
+        this->connectSignals();
+        this->ui->tabWidget_2->setTabEnabled(0,true);
         if (commandRunning == "running")
         {
             while (this == NULL && !this->isVisible())
             {
             }
+            this->disconnectSignals();
+            this->ui->tabWidget_2->setTabEnabled(0,false);
             tailLog();
         }
         processFind->start("\""+sdk+"\"" + "adb shell mount /sdcard");
@@ -883,7 +888,7 @@ void CwmWidget::readFromLog()
                     backupPath = this->ui->lineBackup->text();
                     which = "backupVerify";
                 }
-                readLog == "read";
+                readLog = "read";
                 this->phone->adbReboot();
             }
 

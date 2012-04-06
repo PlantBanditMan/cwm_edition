@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
 {
     QCoreApplication::setOrganizationName("Bracia");
     QCoreApplication::setApplicationName("QtADB");
-    QCoreApplication::setApplicationVersion("0.8.8_cwm_edition");
+    QCoreApplication::setApplicationVersion("0.8.9_cwm_edition");
     QCoreApplication::setOrganizationDomain("http://qtadb.com");
     Application a(argc, argv);
     QPixmap pixmap(":icons/splash.png");
