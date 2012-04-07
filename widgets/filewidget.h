@@ -114,6 +114,7 @@ private:
     QProcess *edit;
     QString oldComputerPath, fileName, filePath;
     QMessageBox *msg;
+    QTextCodec *codec;
 
 public slots:
     void rightDisplay();

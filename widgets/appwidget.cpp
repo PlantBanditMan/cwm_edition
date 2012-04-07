@@ -1150,7 +1150,7 @@ void ThreadBackups::run()
             else
             {
                 iconfile = QDir::currentPath()+"/tmp/"+backupFound.packageName+".png";
-                proces->start("\"" + this->sdk + "\"adb pull \""+appsBackupFolder+ namedir+backupFound.packageName+".png\" "+iconfile);
+                proces->start("\"" + this->sdk + "\"adb pull \""+codec->toUnicode(appsBackupFolder.toUtf8())+ codec->toUnicode(namedir.toUtf8())+codec->toUnicode(backupFound.packageName.toUtf8())+".png\" "+iconfile);
                 proces->waitForFinished(-1);
             }
             QFile icon(iconfile);
