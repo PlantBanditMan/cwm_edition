@@ -27,11 +27,14 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>563</width>
-     <height>824</height>
+     <width>676</width>
+     <height>825</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="layoutCwm">
+    <property name="sizeConstraint">
+     <enum>QLayout::SetDefaultConstraint</enum>
+    </property>
     <property name="leftMargin">
      <number>10</number>
     </property>
@@ -47,7 +50,7 @@
     <item>
      <layout class="QVBoxLayout" name="verticalLayout_10">
       <property name="sizeConstraint">
-       <enum>QLayout::SetFixedSize</enum>
+       <enum>QLayout::SetDefaultConstraint</enum>
       </property>
       <item>
        <widget class="QLabel" name="label">
@@ -157,14 +160,14 @@ p, li { white-space: pre-wrap; }
       </property>
       <property name="minimumSize">
        <size>
-        <width>550</width>
+        <width>665</width>
         <height>106</height>
        </size>
       </property>
       <property name="maximumSize">
        <size>
-        <width>550</width>
-        <height>107</height>
+        <width>16777215</width>
+        <height>16777215</height>
        </size>
       </property>
       <property name="styleSheet">
@@ -248,25 +251,13 @@ p, li { white-space: pre-wrap; }
        <attribute name="title">
         <string>Fix Permissions</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_14">
+       <layout class="QHBoxLayout" name="horizontalLayout_27">
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_8">
-          <property name="spacing">
-           <number>48</number>
-          </property>
-          <property name="leftMargin">
-           <number>0</number>
-          </property>
-          <property name="topMargin">
-           <number>5</number>
-          </property>
-          <property name="rightMargin">
-           <number>0</number>
-          </property>
           <item>
            <widget class="QLabel" name="label_10">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -295,20 +286,36 @@ p, li { white-space: pre-wrap; }
             </property>
             <property name="minimumSize">
              <size>
-              <width>80</width>
+              <width>90</width>
               <height>23</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>80</width>
-              <height>23</height>
+              <width>16777215</width>
+              <height>16777215</height>
              </size>
             </property>
             <property name="text">
              <string>Fix Permissions</string>
             </property>
            </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>10</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
           </item>
          </layout>
         </item>
@@ -358,14 +365,14 @@ p, li { white-space: pre-wrap; }
           <item>
            <widget class="QPushButton" name="buttonFixMarket">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
             <property name="minimumSize">
              <size>
-              <width>90</width>
+              <width>120</width>
               <height>23</height>
              </size>
             </property>
@@ -523,14 +530,14 @@ p, li { white-space: pre-wrap; }
       </property>
       <property name="minimumSize">
        <size>
-        <width>550</width>
+        <width>665</width>
         <height>211</height>
        </size>
       </property>
       <property name="maximumSize">
        <size>
-        <width>550</width>
-        <height>211</height>
+        <width>16777215</width>
+        <height>16777215</height>
        </size>
       </property>
       <property name="palette">
@@ -701,7 +708,7 @@ border-radius: 1px;
          <rect>
           <x>240</x>
           <y>70</y>
-          <width>71</width>
+          <width>81</width>
           <height>101</height>
          </rect>
         </property>
@@ -713,7 +720,7 @@ border-radius: 1px;
           <rect>
            <x>10</x>
            <y>10</y>
-           <width>51</width>
+           <width>52</width>
            <height>91</height>
           </rect>
          </property>
@@ -748,7 +755,7 @@ border-radius: 1px;
        <widget class="QCheckBox" name="checkBackupSdcars">
         <property name="geometry">
          <rect>
-          <x>323</x>
+          <x>350</x>
           <y>80</y>
           <width>16</width>
           <height>16</height>
@@ -761,9 +768,9 @@ border-radius: 1px;
        <widget class="QLabel" name="label_11">
         <property name="geometry">
          <rect>
-          <x>340</x>
+          <x>370</x>
           <y>80</y>
-          <width>191</width>
+          <width>271</width>
           <height>39</height>
          </rect>
         </property>
@@ -781,10 +788,10 @@ p, li { white-space: pre-wrap; }
        <widget class="QWidget" name="layoutWidget15">
         <property name="geometry">
          <rect>
-          <x>340</x>
+          <x>400</x>
           <y>140</y>
-          <width>181</width>
-          <height>25</height>
+          <width>201</width>
+          <height>28</height>
          </rect>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_13">
@@ -828,7 +835,7 @@ p, li { white-space: pre-wrap; }
          <rect>
           <x>11</x>
           <y>11</y>
-          <width>529</width>
+          <width>641</width>
           <height>37</height>
          </rect>
         </property>
@@ -848,19 +855,19 @@ p, li { white-space: pre-wrap; }
          <rect>
           <x>11</x>
           <y>50</y>
-          <width>530</width>
+          <width>641</width>
           <height>16</height>
          </rect>
         </property>
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
         <property name="minimumSize">
          <size>
-          <width>530</width>
+          <width>641</width>
           <height>16</height>
          </size>
         </property>
@@ -933,559 +940,619 @@ p, li { white-space: pre-wrap; }
        <attribute name="title">
         <string>Wipe</string>
        </attribute>
-       <widget class="QPushButton" name="buttonWipe">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="geometry">
-         <rect>
-          <x>400</x>
-          <y>100</y>
-          <width>75</width>
-          <height>23</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Wipe</string>
-        </property>
-       </widget>
-       <widget class="QWidget" name="layoutWidget6">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>70</y>
-          <width>411</width>
-          <height>91</height>
-         </rect>
-        </property>
-        <layout class="QGridLayout" name="gridLayout_4">
-         <item row="0" column="0">
-          <widget class="QCheckBox" name="checkData">
-           <property name="text">
-            <string>wipe dada/factory reset</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QCheckBox" name="checkDalvik">
-           <property name="text">
-            <string>wipe dalvik-cache</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QCheckBox" name="checkCache">
-           <property name="text">
-            <string>wipe cache</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QCheckBox" name="checkBattery">
-           <property name="text">
-            <string>wipe battery stats</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QLabel" name="label_7">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>30</y>
-          <width>521</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+       <layout class="QHBoxLayout" name="horizontalLayout_22">
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_18">
+          <item>
+           <widget class="QLabel" name="label_7">
+            <property name="text">
+             <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Select items to Wipe nad press [Wipe]. Your phone will reboot in Recovery and selected items will be wiped.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-       </widget>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_21">
+            <item>
+             <layout class="QGridLayout" name="gridLayout_4">
+              <item row="0" column="0">
+               <widget class="QCheckBox" name="checkData">
+                <property name="text">
+                 <string>wipe dada/factory reset</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QCheckBox" name="checkDalvik">
+                <property name="text">
+                 <string>wipe dalvik-cache</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QCheckBox" name="checkCache">
+                <property name="text">
+                 <string>wipe cache</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QCheckBox" name="checkBattery">
+                <property name="text">
+                 <string>wipe battery stats</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QPushButton" name="buttonWipe">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>80</width>
+                <height>26</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Wipe</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Fixed</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>60</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>478</width>
+              <height>30</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+       </layout>
       </widget>
       <widget class="QWidget" name="tab_2">
        <attribute name="title">
         <string>Install</string>
        </attribute>
-       <widget class="QWidget" name="layoutWidget7">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>10</y>
-          <width>531</width>
-          <height>131</height>
-         </rect>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout_4">
-         <item>
-          <widget class="QLabel" name="label_5">
-           <property name="text">
-            <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+       <layout class="QHBoxLayout" name="horizontalLayout_23">
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_4">
+          <item>
+           <widget class="QLabel" name="label_5">
+            <property name="text">
+             <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Select zip from /sdcard below and press [Install]. Your phone will reboot in Recovery and the selected zip will be installed.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-           <property name="wordWrap">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_7">
-           <item>
-            <layout class="QVBoxLayout" name="verticalLayout_3">
-             <item>
-              <widget class="QRadioButton" name="radioUpdateZip">
-               <property name="text">
-                <string>apply /sdcard/update.zip</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_6">
-               <item>
-                <widget class="QRadioButton" name="radioInstallPath">
-                 <property name="text">
-                  <string/>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLineEdit" name="lineInstallPath">
-                 <property name="text">
-                  <string/>
-                 </property>
-                 <property name="readOnly">
-                  <bool>true</bool>
-                 </property>
-                 <property name="placeholderText">
-                  <string>choose zip from /sdcard below...</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <widget class="QPushButton" name="buttonInstall">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="text">
-              <string>Install</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-        </layout>
-       </widget>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_7">
+            <item>
+             <layout class="QVBoxLayout" name="verticalLayout_3">
+              <item>
+               <widget class="QRadioButton" name="radioUpdateZip">
+                <property name="text">
+                 <string>apply /sdcard/update.zip</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_6">
+                <item>
+                 <widget class="QRadioButton" name="radioInstallPath">
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="lineInstallPath">
+                  <property name="text">
+                   <string/>
+                  </property>
+                  <property name="readOnly">
+                   <bool>true</bool>
+                  </property>
+                  <property name="placeholderText">
+                   <string>choose zip from /sdcard below...</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QPushButton" name="buttonInstall">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="text">
+               <string>Install</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_4">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>30</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+       </layout>
       </widget>
       <widget class="QWidget" name="tab_3">
        <attribute name="title">
         <string>Backup ROM</string>
        </attribute>
-       <widget class="QWidget" name="layoutWidget13">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>0</y>
-          <width>531</width>
-          <height>141</height>
-         </rect>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout_12">
-         <item>
-          <widget class="QLabel" name="label_8">
-           <property name="text">
-            <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+       <layout class="QHBoxLayout" name="horizontalLayout_20">
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_12">
+          <item>
+           <widget class="QLabel" name="label_8">
+            <property name="text">
+             <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Select Backup folder on /sdcard below and press [Backup]. All partitions will be backed up in Recovery. After Backup is finished and phone fully reboots back to normal you will be given a choice to verify the Backup's MD5 Sum.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-           <property name="wordWrap">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <layout class="QVBoxLayout" name="verticalLayout_2">
-           <item>
-            <widget class="QCheckBox" name="checkDefaultBackupDir">
-             <property name="text">
-              <string>Use Default CWM Recovery Backup Location</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_5">
-             <item>
-              <widget class="QLineEdit" name="lineBackup">
-               <property name="text">
-                <string/>
-               </property>
-               <property name="readOnly">
-                <bool>true</bool>
-               </property>
-               <property name="placeholderText">
-                <string>create or choose directory on /sdcard below...</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="buttonBackup">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
-               <property name="text">
-                <string>Backup</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-          </layout>
-         </item>
-        </layout>
-       </widget>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QVBoxLayout" name="verticalLayout_2">
+            <item>
+             <widget class="QCheckBox" name="checkDefaultBackupDir">
+              <property name="text">
+               <string>Use Default CWM Recovery Backup Location</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_5">
+              <item>
+               <widget class="QLineEdit" name="lineBackup">
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="readOnly">
+                 <bool>true</bool>
+                </property>
+                <property name="placeholderText">
+                 <string>create or choose directory on /sdcard below...</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="buttonBackup">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="text">
+                 <string>Backup</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_5">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>30</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+       </layout>
       </widget>
       <widget class="QWidget" name="tab_4">
        <attribute name="title">
         <string>Restore Backup</string>
        </attribute>
-       <widget class="QWidget" name="layoutWidget9">
-        <property name="geometry">
-         <rect>
-          <x>9</x>
-          <y>87</y>
-          <width>531</width>
-          <height>61</height>
-         </rect>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout_5">
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout">
-           <item>
-            <widget class="QCheckBox" name="checkBacBoot">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="text">
-              <string>/boot</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="checkBacSystem">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="text">
-              <string>/system</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="checkBacData">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="text">
-              <string>/data</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="checkBacCache">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="text">
-              <string>/cache</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="checkBacSdext">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="text">
-              <string>/sd-ext</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_4">
-           <item>
-            <widget class="QLineEdit" name="lineRestore">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="readOnly">
-              <bool>true</bool>
-             </property>
-             <property name="placeholderText">
-              <string>choose backup location on /sdcard below..</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="buttonRestore">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="text">
-              <string>Restore</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QLabel" name="label_9">
-        <property name="geometry">
-         <rect>
-          <x>9</x>
-          <y>9</y>
-          <width>531</width>
-          <height>71</height>
-         </rect>
-        </property>
-        <property name="mouseTracking">
-         <bool>true</bool>
-        </property>
-        <property name="text">
-         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+       <layout class="QHBoxLayout" name="horizontalLayout_24">
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_19">
+          <item>
+           <widget class="QLabel" name="label_9">
+            <property name="mouseTracking">
+             <bool>true</bool>
+            </property>
+            <property name="text">
+             <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Select folder with valid Nandroid Backup and verify backup's  MD5 Sum if you wish. Then select images to restore(select all for full restore) and press [Restore]. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="wordWrap">
-         <bool>true</bool>
-        </property>
-       </widget>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QVBoxLayout" name="verticalLayout_5">
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout">
+              <item>
+               <widget class="QCheckBox" name="checkBacBoot">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="text">
+                 <string>/boot</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="checkBacSystem">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="text">
+                 <string>/system</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="checkBacData">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="text">
+                 <string>/data</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="checkBacCache">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="text">
+                 <string>/cache</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="checkBacSdext">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="text">
+                 <string>/sd-ext</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_4">
+              <item>
+               <widget class="QLineEdit" name="lineRestore">
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="readOnly">
+                 <bool>true</bool>
+                </property>
+                <property name="placeholderText">
+                 <string>choose backup location on /sdcard below..</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="buttonRestore">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>80</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>Restore</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_6">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>30</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+       </layout>
       </widget>
       <widget class="QWidget" name="tab_5">
        <attribute name="title">
         <string>Update ROM</string>
        </attribute>
-       <widget class="QWidget" name="layoutWidget10">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>10</y>
-          <width>531</width>
-          <height>131</height>
-         </rect>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout_6">
-         <item>
-          <widget class="QLabel" name="label_3">
-           <property name="text">
-            <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+       <layout class="QHBoxLayout" name="horizontalLayout_25">
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_20">
+          <item>
+           <layout class="QVBoxLayout" name="verticalLayout_6">
+            <item>
+             <widget class="QLabel" name="label_3">
+              <property name="text">
+               <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;This procedure reboots phone to Recovery, wipes cache and dalvik-cache, updates current ROM, and reboots. It is strongly recommended to Backup your current ROM first!!! Select the new ROM file from /sdcard below and press [Update].&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-           <property name="wordWrap">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_3">
-           <item>
-            <widget class="QLineEdit" name="lineUpdate">
-             <property name="readOnly">
-              <bool>true</bool>
-             </property>
-             <property name="placeholderText">
-              <string>choose updated ROM from /sdcard below...</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="buttonUpdate">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="text">
-              <string>Update</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QCheckBox" name="checkLink2Sd">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>140</y>
-          <width>351</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Copy Link2SD mount script to /system/etc/init.d/ after the Update.</string>
-        </property>
-       </widget>
+              </property>
+              <property name="wordWrap">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_3">
+              <item>
+               <widget class="QLineEdit" name="lineUpdate">
+                <property name="readOnly">
+                 <bool>true</bool>
+                </property>
+                <property name="placeholderText">
+                 <string>choose updated ROM from /sdcard below...</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="buttonUpdate">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="text">
+                 <string>Update</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="checkLink2Sd">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Copy Link2SD mount script to /system/etc/init.d/ after the Update.</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
       </widget>
       <widget class="QWidget" name="tab_6">
        <attribute name="title">
         <string>Flash ROM</string>
        </attribute>
-       <widget class="QWidget" name="layoutWidget14">
-        <property name="geometry">
-         <rect>
-          <x>12</x>
-          <y>12</y>
-          <width>521</width>
-          <height>151</height>
-         </rect>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout_13">
-         <item>
-          <widget class="QLabel" name="label_4">
-           <property name="text">
-            <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+       <layout class="QHBoxLayout" name="horizontalLayout_26">
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_13">
+          <item>
+           <widget class="QLabel" name="label_4">
+            <property name="text">
+             <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;This procedure reboots phone to Recovery, wipes dalvik-cache, formats /boot, /system, /data and /cache partitions, installs zip before(if selected),  installs the new ROM, installs zip after(if selected) and reboots. It is strongly recommended to Backup your current ROM first!!! Select all files from /sdcard below and press [Flash].&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-           <property name="wordWrap">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <layout class="QVBoxLayout" name="verticalLayout_7">
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_11">
-             <item>
-              <widget class="QCheckBox" name="checkBefore">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="text">
-                <string>Install Zip bedore flashing ROM:</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="labelBefore">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
-               <property name="text">
-                <string>(like some wiper...)</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_2">
-             <item>
-              <widget class="QLineEdit" name="lineFlash">
-               <property name="readOnly">
-                <bool>true</bool>
-               </property>
-               <property name="placeholderText">
-                <string>choose new ROM from /sdcard below...</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="buttonFlash">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
-               <property name="text">
-                <string>Flash</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_12">
-             <item>
-              <widget class="QCheckBox" name="checkAfter">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="text">
-                <string>Install Zip after flashing ROM:</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="labelAfter">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
-               <property name="text">
-                <string>(like Google Apps, Theme...)</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-          </layout>
-         </item>
-        </layout>
-       </widget>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QVBoxLayout" name="verticalLayout_7">
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_11">
+              <item>
+               <widget class="QCheckBox" name="checkBefore">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>Install Zip bedore flashing ROM:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="labelBefore">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="text">
+                 <string>(like some wiper...)</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_2">
+              <item>
+               <widget class="QLineEdit" name="lineFlash">
+                <property name="readOnly">
+                 <bool>true</bool>
+                </property>
+                <property name="placeholderText">
+                 <string>choose new ROM from /sdcard below...</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="buttonFlash">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="text">
+                 <string>Flash</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_12">
+              <item>
+               <widget class="QCheckBox" name="checkAfter">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>Install Zip after flashing ROM:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="labelAfter">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="text">
+                 <string>(like Google Apps, Theme...)</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+       </layout>
       </widget>
      </widget>
     </item>
     <item>
      <widget class="QTabWidget" name="tabWidget_2">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
       <property name="minimumSize">
        <size>
-        <width>550</width>
+        <width>665</width>
         <height>425</height>
        </size>
       </property>
       <property name="maximumSize">
        <size>
-        <width>550</width>
+        <width>16777215</width>
         <height>16777215</height>
        </size>
       </property>
@@ -1583,7 +1650,7 @@ padding: 1px;
             </property>
             <property name="minimumSize">
              <size>
-              <width>94</width>
+              <width>120</width>
               <height>25</height>
              </size>
             </property>
