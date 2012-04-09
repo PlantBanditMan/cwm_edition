@@ -1034,7 +1034,7 @@ void FileWidget::leftSelectedCount()
 {
     QModelIndexList indexList = this->leftTableView->selectionModel()->selectedRows(1);
     QString word(QString::number(indexList.size()) + "/" +
-                 QString::number(this->computerModel->rowCount())+ " " + tr("selected           (double click file to open it)", "selected label below table"));
+                 QString::number(this->computerModel->rowCount())+ " " + tr("selected           (double click file to open it, middle button click to select multiple files)", "selected label below table"));
     this->ui->leftLabelSelectedCount->setText(word);
 }
 
@@ -1925,7 +1925,7 @@ void FileWidget::rightSelectedCount()
 {
     QModelIndexList indexList = this->rightTableView->selectionModel()->selectedRows(1);
     QString word(QString::number(indexList.size()) + "/" +
-                 QString::number(this->rightTableView->model()->rowCount(QModelIndex()))+ " " + tr("selected           (double click file to open it)"));
+                 QString::number(this->rightTableView->model()->rowCount(QModelIndex()))+ " " + tr("selected           (double click file to open it, middle button click to select multiple files)"));
     this->ui->rightLabelSelectedCount->setText(word);
 }
 
