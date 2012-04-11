@@ -156,6 +156,7 @@ private slots:
     void on_buttonRun_pressed();
     void inRecovery();
     void inDevice();
+    void setCustomFonts();
 
 signals:
     void phoneConnectionChanged(int);

@@ -1,3 +1,7 @@
+4/11/2012
+-fixed bug with MD5 Sum Verify after Backup is made;
+
+
 
 4/4/2012
 -enabled "Flash ROM" in recovery mode, useful for unbricking some devices;

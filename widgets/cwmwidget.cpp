@@ -88,14 +88,8 @@ CwmWidget::CwmWidget(QWidget *parent) :
     this->settings->changeFont();
 
     currentDir = QDir::currentPath();
-    QFont font, fontStatus;
-    font.setPointSize(14);
-    fontStatus.setPointSize(10);
-    font.setBold(true);
-    fontStatus.setBold(true);
-    this->ui->label->setFont(font);
-    this->ui->plainTextEditStatus->setFont(fontStatus);
-    this->ui->label_2->setFont(fontStatus);
+
+    this->setCustomFonts();
 
     if (this->initial == "No such file")
         this->disableCwm();
@@ -227,13 +221,7 @@ void CwmWidget::connectionChanged()
         mountsUpdate();
         this->sdcardDisplay();
         this->buttonsEnabled();
-        QFont font, fontStatus;
-        font.setPointSize(14);
-        fontStatus.setPointSize(10);
-        font.setBold(true);
-        fontStatus.setBold(true);
-        this->ui->label->setFont(font);
-        this->ui->plainTextEditStatus->setFont(fontStatus);
+        this->setCustomFonts();
         this->ui->tabWidget_2->setTabEnabled(0,true);
         if (readLog == "read")
         {
@@ -251,13 +239,7 @@ void CwmWidget::connectionChanged()
         mountsEnable();
         this->ui->tabWidget_2->setCurrentIndex(1);
         this->buttonsDisabled();
-        QFont font, fontStatus;
-        font.setPointSize(14);
-        fontStatus.setPointSize(10);
-        font.setBold(true);
-        fontStatus.setBold(true);
-        this->ui->label->setFont(font);
-        this->ui->plainTextEditStatus->setFont(fontStatus);
+        this->setCustomFonts();
         this->connectSignals();
         this->ui->tabWidget_2->setTabEnabled(0,true);
         if (commandRunning == "running")
@@ -480,6 +462,7 @@ void CwmWidget::sdcardDisplay()
         this->ui->pushButtonDirectoryUp->setDisabled(true);
     else if (this->ui->lineEditPath->text().startsWith("/sdcard"))
         this->ui->pushButtonDirectoryUp->setEnabled(true);
+    this->setCustomFonts();
 }
 
 void CwmWidget::sdcardDoubleClick()
@@ -540,6 +523,7 @@ void CwmWidget::processFinished()
     this->ui->plainTextEditStatus->insertPlainText("--------------------\n");
     this->ui->plainTextEditStatus->insertPlainText("Process Finished!\n");
     this->ui->plainTextEditStatus->insertPlainText("--------------------\n");
+    this->setCustomFonts();
     this->ui->plainTextEditStatus->ensureCursorVisible();
     if (which == "flash recovery")
     {
@@ -551,6 +535,7 @@ void CwmWidget::processFinished()
             this->ui->plainTextEditStatus->insertPlainText("--------------------\n");
             this->ui->plainTextEditStatus->insertPlainText("Process Failed!\n");
             this->ui->plainTextEditStatus->insertPlainText("--------------------\n");
+            this->setCustomFonts();
             this->ui->plainTextEditStatus->ensureCursorVisible();
             QMessageBox::information(this,"Flash New Recovery:","Flashing New Recovery FAILED!!!\nTry with moving img file to the root of /sdcard or changing its name to something more simple.\n\nSee Status for Detailes.");
         }
@@ -578,6 +563,8 @@ void CwmWidget::processFinished()
 
 void CwmWidget::finishedWhich()
 {
+    processFind->start("\""+this->sdk+"\""+"adb shell busybox rm -r /cache/qtadb/");
+    processFind->waitForFinished(-1);
     if (which == "sdbackup")
     {
         which = "sdrestore";
@@ -586,6 +573,7 @@ void CwmWidget::finishedWhich()
         this->ui->plainTextEditStatus->insertPlainText("SD Card Backup Finished!\n");
         this->ui->plainTextEditStatus->insertPlainText("----------------------------\n");
         this->ui->plainTextEditStatus->insertPlainText("\nRebooting Phone...\n");
+        this->setCustomFonts();
         this->ui->plainTextEditStatus->ensureCursorVisible();
         buttonsDisabled();
         QTimer::singleShot(2000, this, SLOT(createPartition()));
@@ -598,6 +586,7 @@ void CwmWidget::finishedWhich()
         this->ui->plainTextEditStatus->insertPlainText("-----------------------------\n");
         this->ui->plainTextEditStatus->insertPlainText("SD Card Restore Finished!\n");
         this->ui->plainTextEditStatus->insertPlainText("-----------------------------\n");
+        this->setCustomFonts();
         this->ui->plainTextEditStatus->ensureCursorVisible();
         buttonsEnabled();
         this->ui->buttonSystem->setEnabled(true);
@@ -638,10 +627,7 @@ void CwmWidget::on_buttonFixPermissions_pressed()
 
 void CwmWidget::printProcess(QString processOut)
 {
-    QFont fontStatus;
-    fontStatus.setPointSize(10);
-    fontStatus.setBold(true);
-    this->ui->plainTextEditStatus->setFont(fontStatus);
+    this->setCustomFonts();
     int i;
     for (i = 0; i < processOut.length(); i++)
     {
@@ -723,6 +709,7 @@ void CwmWidget::on_buttonCreate_pressed()
        this->ui->plainTextEditStatus->insertPlainText("-----------------------------\n");
        this->ui->plainTextEditStatus->insertPlainText("SD Card Backup Started...\n");
        this->ui->plainTextEditStatus->insertPlainText("-----------------------------\n");
+       this->setCustomFonts();
        this->ui->plainTextEditStatus->ensureCursorVisible();
        this->buttonsDisabled();
        which = "sdbackup";
@@ -810,6 +797,7 @@ void CwmWidget::extendedcommandFile(QString infoLine, QString commandLine)
         this->ui->plainTextEditStatus->clear();
         ui->plainTextEditStatus->setStyleSheet( "QPlainTextEdit {background-color:black;color:lightgreen;border: 1px solid #020202;border-radius: 1px;}" );
         this->ui->plainTextEditStatus->insertPlainText("Rebooting to Recovery...");
+        this->setCustomFonts();
         this->ui->tabWidget_2->setCurrentIndex(1);
     }
 }
@@ -832,6 +820,7 @@ void CwmWidget::readFromLog()
     this->ui->plainTextEditStatus->insertPlainText("--------------------\n");
     this->ui->plainTextEditStatus->ensureCursorVisible();
     ui->plainTextEditStatus->setStyleSheet( "QPlainTextEdit {background-color:black;color:lightgreen;border: 1px solid #020202;border-radius: 1px;}" );
+    this->setCustomFonts();
     processFind->start("\""+this->sdk+"\""+"adb shell busybox find /cache/recovery/log");
     processFind->waitForFinished(-1);
     QString out = processFind->readAll();
@@ -858,6 +847,7 @@ void CwmWidget::readFromLog()
     if (sdFailed.contains("Can't mount /sdcard"))
     {
         ui->plainTextEditStatus->setStyleSheet( "QPlainTextEdit {background-color:black;color:red;border: 1px solid #020202;border-radius: 1px;}" );
+        this->setCustomFonts();
         QMessageBox::warning(this, tr("Log:"),"Timed out waiting for SD Card to mount! See Log for details.\n\nYou will need to repeat this operation.");
     }
     else
@@ -903,6 +893,7 @@ void CwmWidget::processStarted()
     this->ui->plainTextEditStatus->insertPlainText("--------------------\n");
     this->ui->plainTextEditStatus->insertPlainText("Process Started...\n");
     this->ui->plainTextEditStatus->insertPlainText("--------------------\n");
+    this->setCustomFonts();
     this->ui->plainTextEditStatus->ensureCursorVisible();
     this->buttonsDisabled();
     this->mountsDisable();
@@ -1194,6 +1185,7 @@ void CwmWidget::on_buttonInsert_pressed()
                 this->ui->plainTextEditStatus->insertPlainText("---------------------------\n");
                 this->ui->plainTextEditStatus->insertPlainText("Backup Verify: Started...\n");
                 this->ui->plainTextEditStatus->insertPlainText("---------------------------\n");
+                this->setCustomFonts();
                 this->ui->tabWidget_2->setCurrentIndex(1);
                 this->adbPushTool("domd5sum.sh");
                 processWhich->start("\""+sdk+"\"" + "adb shell /cache/qtadb/domd5sum.sh " + this->codec->toUnicode(itemPath.toUtf8()));
@@ -1398,6 +1390,7 @@ void CwmWidget::md5sumVerify()
         this->ui->plainTextEditStatus->insertPlainText("-------------------------\n");
         this->ui->plainTextEditStatus->insertPlainText("Backup Verify: FAILED!!!\n");
         this->ui->plainTextEditStatus->insertPlainText("-------------------------\n");
+        this->setCustomFonts();
         if (QMessageBox::warning(this,"Insert Selection:",tr("This Nandroid Backup is CORRUPT!\nSee result for details."),QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
             this->on_buttonBackup_pressed();
         return;
@@ -1408,6 +1401,7 @@ void CwmWidget::md5sumVerify()
         this->ui->plainTextEditStatus->insertPlainText("-----------------------------\n");
         this->ui->plainTextEditStatus->insertPlainText("Backup Verify: SUCCESS!!!\n");
         this->ui->plainTextEditStatus->insertPlainText("-----------------------------\n");
+        this->setCustomFonts();
         QMessageBox::information(this,"Insert Selection:",tr("This Nandroid Backup is GOOD."),QMessageBox::Ok);
         this ->ui->lineRestore->setDisabled(false);
         this ->ui->lineBackup->clear();
@@ -1482,6 +1476,7 @@ void CwmWidget::backupAvailable()
         this->ui->plainTextEditStatus->insertPlainText("-----------------------------\n");
         this->ui->plainTextEditStatus->insertPlainText("SD Card Restore Started...\n");
         this->ui->plainTextEditStatus->insertPlainText("-----------------------------\n");
+        this->setCustomFonts();
         this->ui->plainTextEditStatus->ensureCursorVisible();
         processStarted();
         QList<File> *fileList = NULL;
@@ -1534,9 +1529,10 @@ void CwmWidget::backupAvailable()
         this->ui->plainTextEditStatus->insertPlainText("---------------------------\n");
         this->ui->plainTextEditStatus->insertPlainText("Backup Verify: Started...\n");
         this->ui->plainTextEditStatus->insertPlainText("---------------------------\n");
+        this->setCustomFonts();
         this->ui->tabWidget_2->setCurrentIndex(1);
         this->adbPushTool("domd5sum.sh");
-        processWhich->start("\""+sdk+"\"" + "adb shell busybox /cache/qtadb/domd5sum.sh \"" + codec->toUnicode(this->threadSdcard->backupPath.toUtf8()) + "\"" );
+        processWhich->start("\""+sdk+"\"" + "adb shell /cache/qtadb/domd5sum.sh \"" + codec->toUnicode(this->threadSdcard->backupPath.toUtf8()) + "\"" );
         processWhich->waitForReadyRead(-1);
     }
     else if (which == "fix market")
@@ -1638,6 +1634,7 @@ void CwmWidget::on_buttonFixMarket_pressed()
     this->ui->tabWidget_2->setCurrentIndex(1);
     this->ui->plainTextEditStatus->setStyleSheet( "QPlainTextEdit {background-color:black;color:white;border: 1px solid #020202;border-radius: 1px;}" );
     this->ui->plainTextEditStatus->insertPlainText("Mounting SD Card... Please, wait...");
+    this->setCustomFonts();
     this->ui->plainTextEditStatus->ensureCursorVisible();
     QProcess *sd = new QProcess;
     QString outsd;
@@ -1704,6 +1701,7 @@ void CwmWidget::sdbackupCanceled()
         this->ui->plainTextEditStatus->insertPlainText("SD Card Backup Canceled!\n");
         this->ui->plainTextEditStatus->insertPlainText("SD Card Partitioning Canceled!\n");
         this->ui->plainTextEditStatus->insertPlainText("----------------------------------\n");
+        this->setCustomFonts();
         this->ui->plainTextEditStatus->ensureCursorVisible();
         buttonsEnabled();
         this->ui->buttonSystem->setEnabled(true);
@@ -1726,6 +1724,7 @@ void CwmWidget::sdrestoreCanceled()
     this->ui->plainTextEditStatus->insertPlainText("SD Card Partitioning Finished!\n");
     this->ui->plainTextEditStatus->insertPlainText("SD Card Restore Canceled!\n");
     this->ui->plainTextEditStatus->insertPlainText("-----------------------------------\n");
+    this->setCustomFonts();
     this->ui->plainTextEditStatus->ensureCursorVisible();
     buttonsEnabled();
     this->ui->buttonSystem->setEnabled(true);
@@ -2016,4 +2015,16 @@ void CwmWidget::inDevice()
         fontStatus.setBold(true);
         this->ui->label_2->setFont(fontStatus);
     }
+}
+
+void CwmWidget::setCustomFonts()
+{
+    QFont font, fontStatus;
+    font.setPointSize(14);
+    fontStatus.setPointSize(10);
+    font.setBold(true);
+    fontStatus.setBold(true);
+    this->ui->label->setFont(font);
+    this->ui->plainTextEditStatus->setFont(fontStatus);
+    this->ui->label_2->setFont(fontStatus);
 }
