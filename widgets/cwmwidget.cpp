@@ -222,6 +222,7 @@ void CwmWidget::connectionChanged()
         this->sdcardDisplay();
         this->buttonsEnabled();
         this->setCustomFonts();
+        this->ui->tabMounts->setEnabled(true);
         this->ui->tabWidget_2->setTabEnabled(0,true);
         if (readLog == "read")
         {
@@ -237,6 +238,7 @@ void CwmWidget::connectionChanged()
         emit this->phoneConnectionChanged(RECOVERY);
         //disconnectSignals();
         mountsEnable();
+        this->ui->tabMounts->setEnabled(true);
         this->ui->tabWidget_2->setCurrentIndex(1);
         this->buttonsDisabled();
         this->setCustomFonts();
@@ -247,6 +249,7 @@ void CwmWidget::connectionChanged()
             while (this == NULL && !this->isVisible())
             {
             }
+            this->ui->tabMounts->setEnabled(false);
             this->disconnectSignals();
             this->ui->tabWidget_2->setTabEnabled(0,false);
             tailLog();
