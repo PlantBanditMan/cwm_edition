@@ -1,3 +1,6 @@
+4/13/2012/2-fixed Apps not listed with some /sd-ext configurations;
+
+
 4/13/2012
 -fixed possible user interaction with mount/unmount buttons during recovery operations are taking place;
 

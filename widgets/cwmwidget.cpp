@@ -1625,7 +1625,6 @@ void CwmWidget::on_buttonFlash_pressed()
     if (QMessageBox::question(this, tr("Flash ROM:"),"Your phone will reboot in Recovery and the following actions will be performed:\n---dalvik-cache will be wiped;\n---/boot, /system, /data and /cache partitions will be formated;" + msgBefore + "\n---\"" + romPath + "\" will be flashed;" + msgAfter + "\n\nAre you sure?",QMessageBox::Ok | QMessageBox::Cancel) == QMessageBox::Cancel)
          return;
     this->adbPushTool("dowipedalvikcache.sh");
-    QString dalvik = "run_program(\"/cache/qtadb/dowipedalvikcache.sh\");\nassert(format(\"/data\"));\nassert(format(\"/cache\"));\nassert(format(\"/boot\"));\nassert(format(\"/system\"));\n";
     this->extendedcommandFile("ui_print(\"Flashing New ROM...\");", "run_program(\"/cache/qtadb/dowipedalvikcache.sh\");\nassert(format(\"/data\"));\nassert(format(\"/cache\"));\nassert(format(\"/boot\"));\nassert(format(\"/system\"));\n" + commandBefore + "install_zip(\"" + romPath + "\");\n" + commandAfter);
     this->extendedcommandFile("execute commands", "");
     this->phone->adbRebootRecovery();

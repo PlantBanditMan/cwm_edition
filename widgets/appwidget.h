@@ -156,14 +156,13 @@ private slots:
     void on_toolButtonBackup_pressed();
     void on_toolButtonRestore_pressed();
     void on_toolButtonUninstall_pressed();
-    void on_toolButtonInstall_pressed();
+//    void on_toolButtonInstall_pressed();
     void toolButtonBackupApp();
     void toolButtonBackupData();
     void toolButtonBackupAppAndData();
     void toolButtonRestoreApp();
     void toolButtonRestoreData();
     void toolButtonRestoreAppAndData();
-    void toolButtonInstallOnSd();
     void comboBoxAppsChanged();
     void refreshApps();
     void refreshBackups();

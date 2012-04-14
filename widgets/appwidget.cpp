@@ -805,28 +805,28 @@ void AppWidget::on_toolButtonBackup_pressed()
         connect(this->appsDialog,SIGNAL(closed()),this,SLOT(refreshBackups()));
 }
 
-void AppWidget::on_toolButtonInstall_pressed()
-{
-    QStringList filesToInstall;
-    filesToInstall = QFileDialog::getOpenFileNames(this, tr("select apps to install"),".", "Apk file (*.apk)");
-    if (filesToInstall.length() == 0)
-        return;
-    QList<App> appList;
-    App *app = NULL;
-    while (!filesToInstall.isEmpty())
-    {
-        app = this->getAppInfo(filesToInstall.takeFirst());
-        if (app != NULL)
-            appList.append(*app);
-    }
-    if (this->appsDialog != NULL)
-        delete this->appsDialog;
-    this->appsDialog=new appDialog(this,appList,appDialog::Install,appDialog::None);
-    this->appsDialog->show();
-    connect(this->appsDialog, SIGNAL(progressValue(int,int)), this, SIGNAL(progressValue(int,int)));
-    connect(this->appsDialog, SIGNAL(closed()), this, SIGNAL(progressFinished()));
-    connect(this->appsDialog,SIGNAL(closed()),this,SLOT(refreshApps()));
-}
+//void AppWidget::on_toolButtonInstall_pressed()
+//{
+//    QStringList filesToInstall;
+//    filesToInstall = QFileDialog::getOpenFileNames(this, tr("select apps to install"),".", "Apk file (*.apk)");
+//    if (filesToInstall.length() == 0)
+//        return;
+//    QList<App> appList;
+//    App *app = NULL;
+//    while (!filesToInstall.isEmpty())
+//    {
+//        app = this->getAppInfo(filesToInstall.takeFirst());
+//        if (app != NULL)
+//            appList.append(*app);
+//    }
+//    if (this->appsDialog != NULL)
+//        delete this->appsDialog;
+//    this->appsDialog=new appDialog(this,appList,appDialog::Install,appDialog::None);
+//    this->appsDialog->show();
+//    connect(this->appsDialog, SIGNAL(progressValue(int,int)), this, SIGNAL(progressValue(int,int)));
+//    connect(this->appsDialog, SIGNAL(closed()), this, SIGNAL(progressFinished()));
+//    connect(this->appsDialog,SIGNAL(closed()),this,SLOT(refreshApps()));
+//}
 
 void AppWidget::on_toolButtonUninstall_pressed()
 {
@@ -1381,6 +1381,9 @@ void ThreadApps::run()
         {
             if (!sdFolder.endsWith("/",Qt::CaseInsensitive))
                 sdFolder.append("/");
+            proces.start("\"" + this->sdk + "\"adb shell busybox ls -l "+ codec->toUnicode(sdFolder.toUtf8()) + "/*/*.apk");
+            proces.waitForFinished(-1);
+            output=proces.readAll();
             proces.start("\"" + this->sdk + "\"adb shell busybox ls -l "+ codec->toUnicode(sdFolder.toUtf8()) + "/*.apk");
             proces.waitForFinished(-1);
             output.append(proces.readAll());
@@ -1410,9 +1413,6 @@ void ThreadApps::run()
                     appList.append(app);
                 }
             }
-//                    }
-//                }
-//            }
         }
     }
     emit this->maximum(appList.size());
@@ -1589,11 +1589,6 @@ void AppWidget::toolButtonBackupAppAndData()
     this->withData = true;
     this->withApk = true;
     on_toolButtonBackup_pressed();
-}
-
-void AppWidget::toolButtonInstallOnSd()
-{
-
 }
 
 void AppWidget::toolButtonRestoreApp()
