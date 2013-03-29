@@ -1742,12 +1742,12 @@ Choose one backup from combo above to restore it</source>
     <message>
         <location filename="../widgets/settingswidget.ui" line="514"/>
         <source>Left to right</source>
-        <translation type="unfinished"></translation>
+        <translation>Links nach Rechts</translation>
     </message>
     <message>
         <location filename="../widgets/settingswidget.ui" line="519"/>
         <source>Right to left</source>
-        <translation type="unfinished"></translation>
+        <translation>Rechts nach Links</translation>
     </message>
     <message>
         <location filename="../widgets/settingswidget.ui" line="527"/>
@@ -2035,12 +2035,12 @@ Choose one backup from combo above to restore it</source>
     <message>
         <location filename="../widgets/settingswidget.cpp" line="152"/>
         <source>Reset settings??</source>
-        <translation type="unfinished"></translation>
+        <translation>Einstellungen zurücksetzen?</translation>
     </message>
     <message>
         <location filename="../widgets/settingswidget.cpp" line="152"/>
         <source>Are you sure you want restore settings to defaults???</source>
-        <translation type="unfinished"></translation>
+        <translation>Sollen die Einstellungen wirklich auf die Standardwerte gesetzt werden?</translation>
     </message>
     <message>
         <location filename="../widgets/settingswidget.cpp" line="583"/>
@@ -2074,7 +2074,7 @@ Choose one backup from combo above to restore it</source>
     <message>
         <location filename="../widgets/settingswidget.cpp" line="732"/>
         <source>Are you sure you want to associate *.apk files with QtADB???</source>
-        <translation type="unfinished"></translation>
+       <translation>Sollen wirklich alle *.apk Dateien mit QtADB geöfftnet werden?</translation>
     </message>
     <message>
         <location filename="../widgets/settingswidget.cpp" line="744"/>
@@ -2084,7 +2084,7 @@ Choose one backup from combo above to restore it</source>
     <message>
         <location filename="../widgets/settingswidget.cpp" line="815"/>
         <source>&lt;Not Found&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Nicht gefunden&gt;</translation>
     </message>
 </context>
 <context>
@@ -2109,12 +2109,12 @@ QtADB shell help
     <message>
         <location filename="../widgets/shellwidget.cpp" line="219"/>
         <source>Shift+CTRL+C          - copy selected text to clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Shift+STRG+C</translation>
     </message>
     <message>
         <location filename="../widgets/shellwidget.cpp" line="220"/>
         <source>Shift+CTRL+V          - paste text from clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Shift+STRG+V</translation>
     </message>
     <message>
         <location filename="../widgets/shellwidget.cpp" line="221"/>
