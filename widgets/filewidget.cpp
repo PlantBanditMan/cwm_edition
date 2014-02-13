@@ -695,6 +695,7 @@ void FileWidget::computerDisplay(QTableWidget *tableWidget)
                    appName.replace("<packageName>", app->packageName);
                    if (this->settings->showAppName)
                       tmpFile.fileName = appName;
+
                    delete app;
                    app = NULL;
                  }
@@ -722,6 +723,7 @@ void FileWidget::computerDisplay(QTableWidget *tableWidget)
                    appName.replace("<packageName>", packageName);
                    if (this->settings->showAppName)
                       tmpFile.fileName = appName;
+
                    delete app;
                    app = NULL;
                  }
@@ -1477,7 +1479,15 @@ void FileWidget::phoneDelete()
     while (!indexList.isEmpty())
     {
         index = sortModel->mapToSource(indexList.takeFirst());
+
+      //  QMessageBox::information(this, tr("Deleting:"), fileModel->getFile(index.row()).fileName,
+      //                                QMessageBox::Ok);
         phoneTmp->remove(fileModel->getFile(index.row()).fileName);
+
+      //  QString s = QString::number(phoneTmp->remove(fileModel->getFile(index.row()).fileName));
+
+     //   QMessageBox::information(this, tr("Deleting:"), s,
+      //                                QMessageBox::Ok);
     }
     if (this->leftTableView->hasFocus())
     {
@@ -1738,13 +1748,27 @@ void FileWidget::phoneRenameSlot(QModelIndex indexS, QModelIndex indexE)
     }
     disconnect (fileModel, SIGNAL(dataChanged(QModelIndex, QModelIndex)),
                 this, SLOT(phoneRenameSlot(QModelIndex, QModelIndex)));
-
+QString oldFile, newFile;//, s;
     if (indexS == indexE)
     {
+        newFile = indexS.data(Qt::DisplayRole).toString();
         File tmpFile = fileModel->getFile(indexS.row());
-        QString oldFile = tmpFile.filePath;
+        oldFile = tmpFile.filePath;
         oldFile.remove(phoneTmp->getPath());
-        phoneTmp->rename(oldFile, indexS.data(Qt::DisplayRole).toString());
+        phoneTmp->rename(oldFile, newFile);
+
+
+
+
+//        QMessageBox::information(this, tr("Deleting:"), phone->getPath()+oldFile,
+//                                              QMessageBox::Ok);
+//        QMessageBox::information(this, tr("Deleting:"), phone->getPath()+newFile,
+//                                              QMessageBox::Ok);
+
+     //   s = QString::number(phoneTmp->rename(oldFile, newFile));
+    //    QMessageBox::information(this, tr("Deleting:"), s,
+         //                                     QMessageBox::Ok);
+
         if (this->leftTableView->hasFocus())
         {
             this->leftDisplay();
@@ -1796,6 +1820,10 @@ void FileWidget::rightComboBox()
             ui->rightComboBox->lineEdit()->setText("<Not Found>");
         }
     }
+
+    if (cboxdir == "Internal Storage")
+        cboxdir = "/data/media/0/";
+
     qDebug()<<"phonePath ="<<cboxdir;
     if (phone->cd(cboxdir))
     {
@@ -1880,11 +1908,10 @@ void FileWidget::rightDoubleClick()
         {
             fileName = fileName.split(" -> ").at(1);
         }
-        if (this->phone->cd(fileName))
-        {
-            this->rightDisplay();
-        }
-        else if (fileType == "file")
+
+      //  QMessageBox::information(this, tr("Information:"), fileName, QMessageBox::Ok);
+
+        if (fileType == "file")
         {
             pulled->removePath(QDir::currentPath()+"/tmp/phone/" + fileName);
             removeFile();
@@ -1903,6 +1930,10 @@ void FileWidget::rightDoubleClick()
             QDesktopServices::openUrl(QUrl("file:///" + QDir::currentPath()+"/tmp/phone/" + fileName, QUrl::TolerantMode));
             pulled->addPath(QDir::currentPath()+"/tmp/phone/" + fileName);
             connect(pulled, SIGNAL(fileChanged(QString)), this, SLOT(saveFile()));
+        }
+        else if (this->phone->cd(fileName))
+        {
+            this->rightDisplay();
         }
     }
 }
@@ -1995,8 +2026,12 @@ void ThreadFind::run()
     QString output;
     QString path, file;
     QStringList strList;
-    proces->start("\""+this->sdk+"\"adb shell busybox find "+this->path+" -iname \'*"+this->fileName+"*\'");
-
+    proces->start("\""+this->sdk+"\"adb shell su");
+    proces->waitForFinished(-1);
+    if (proces->readAll().contains("su: not found"))
+        proces->start("\""+this->sdk+"\"adb shell busybox find "+this->path+" -iname \'*"+this->fileName+"*\'");
+    else
+        proces->start("\""+this->sdk+"\"adb shell su -c 'busybox find "+this->path+" -iname \'*"+this->fileName+"*\'");
     Phone phone(this->sdk,false);
     phone.setConnectionState(DEVICE);
 
@@ -2488,20 +2523,36 @@ void FileWidget::saveFile()
     pulled->removePath(QDir::currentPath()+"/tmp/phone/" + fileName);
     if (QMessageBox::information(this,"Open file:","File was changed!\n\nSave changes to Phone?",QMessageBox::Save | QMessageBox::Discard) == QMessageBox::Save)
     {
-        edit->start("\""+sdk+"\""+"adb shell busybox stat \"" + codec->toUnicode(filePath.toUtf8()) + "\"");
+        QString output;
+        edit->start("\""+sdk+"\""+"adb shell su -c 'busybox stat \"" + codec->toUnicode(filePath.toUtf8()) + "\"'");
         edit->waitForFinished(-1);
-        QString output = edit->readAll();
+        output = edit->readAll();
+        if (output.contains("su: not found"))
+        {
+            edit->start("\""+sdk+"\""+"adb shell busybox stat \"" + codec->toUnicode(filePath.toUtf8()) + "\"");
+            edit->waitForFinished(-1);
+            output = edit->readAll();
+        }
         int start = output.indexOf("Access:",Qt::CaseSensitive);
         start+=7;
         int end = output.indexOf("Uid:",start,Qt::CaseSensitive);
         QString fPerm = output.mid(start, end-start);
         fPerm = fPerm.trimmed(); //(0777/lrwxrwxrwx)
         QStringList permList = fPerm.split("/");
-        QString chmod = permList[0].right(3);
+        QString chmod = permList[0].right(3).append(" \"");
+
+
+      //  QMessageBox::information(this,"",chmod,QMessageBox::Ok);
+
         if (filePath.startsWith("/system"))
         {
-            edit->start("\""+sdk+"\""+"adb shell busybox mount -o remount,rw /system");
+            edit->start("\""+sdk+"\""+"adb shell su -c 'busybox mount -o remount,rw /system'");
             edit->waitForFinished(-1);
+            if (edit->readAll().contains("su: not found"))
+            {
+                edit->start("\""+sdk+"\""+"adb shell busybox mount /system");
+                edit->waitForFinished(-1);
+            }
         }
         msg->setText("Saving file to Phone... Please, wait...");
         connect(edit, SIGNAL(started()), msg, SLOT(exec()));
@@ -2510,8 +2561,13 @@ void FileWidget::saveFile()
         edit->waitForFinished(-1);
         disconnect(edit, SIGNAL(started()), msg, SLOT(exec()));
         disconnect(edit, SIGNAL(finished(int)), msg, SLOT(accept()));
-        edit->start("\""+sdk+"\""+"adb shell busybox chmod " + chmod.append(" \"") + codec->toUnicode(filePath.toUtf8()) + "\"");
+        edit->start("\""+sdk+"\""+"adb shell su -c 'busybox chmod " + chmod + codec->toUnicode(filePath.toUtf8()) + "\"'");
         edit->waitForFinished(-1);
+        if (edit->readAll().contains("su: not found"))
+        {
+            edit->start("\""+sdk+"\""+"adb shell busybox chmod " + chmod + codec->toUnicode(filePath.toUtf8()) + "\"");
+            edit->waitForFinished(-1);
+        }
 //        if (folder.startsWith("/system"))
 //        {
 //            edit->start("\""+sdk+"\""+"adb shell busybox mount -o remount,ro,noatime /system");

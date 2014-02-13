@@ -836,9 +836,15 @@ void SettingsWidget::detectSdExtFolder()
         QString output;
         this->sdFolder = "";
 
-        shell->start("\"" + this->sdkPath + "\"adb shell busybox 'stat /data/app | grep \"File\"'");
+        shell->start("\"" + this->sdkPath + "\"adb shell su -c 'busybox 'stat /data/app | grep \"File\"''");
         shell->waitForFinished();
         output = shell->readAll();
+        if (output.contains("su: not found"))
+        {
+            shell->start("\"" + this->sdkPath + "\"adb shell busybox 'stat /data/app | grep \"File\"'");
+            shell->waitForFinished();
+            output = shell->readAll();
+        }
         if (output.contains("->"))
         {
             output.remove(QRegExp("^.*->"));
@@ -847,9 +853,15 @@ void SettingsWidget::detectSdExtFolder()
         }
         else
         {
-            shell->start("\"" + this->sdkPath + "\"adb shell busybox mount");
+            shell->start("\"" + this->sdkPath + "\"adb shell su -c 'busybox mount'");
             shell->waitForFinished();
             output = shell->readAll();
+            if (output.contains("su: not found"))
+            {
+                shell->start("\"" + this->sdkPath + "\"adb shell busybox mount");
+                shell->waitForFinished();
+                output = shell->readAll();
+            }
             if (output.contains("ext"))
             {
                     QStringList lines = output.split("\n", QString::SkipEmptyParts);
@@ -870,7 +882,7 @@ void SettingsWidget::detectSdExtFolder()
         }
         if (!this->sdFolder.isEmpty() && !this->sdFolder.endsWith("/",Qt::CaseInsensitive))
             this->sdFolder.append("/");
-        if (this->sdFolder.isEmpty())
+        if (this->sdFolder.isEmpty() || this->sdFolder.contains("/system"))
             this->ui->editSdExt->setText(tr("<Not Found>"));
         else
             this->ui->editSdExt->setText(this->sdFolder);
@@ -946,11 +958,18 @@ void SettingsWidget::appsBackupFolderExists()
            this->ui->editBacFolder->setText(newAppsBackupFolder.append("/"));
            settings.setValue("appsBackupFolder",newAppsBackupFolder);
         }
-        command = "\""+this->sdkPath+"\""+"adb shell busybox ls \""+newAppsBackupFolder+"\"";
-        qDebug()<<command;
+        command = "\""+this->sdkPath+"\""+"adb shell su -c 'busybox ls \""+newAppsBackupFolder+"\"'";
         sdcard->start(command);
         sdcard->waitForFinished(-1);
         outputLine=sdcard->readLine();
+        if (outputLine.contains("su: not found"))
+        {
+            command = "\""+this->sdkPath+"\""+"adb shell busybox ls \""+newAppsBackupFolder+"\"";
+            sdcard->start(command);
+            sdcard->waitForFinished(-1);
+            outputLine=sdcard->readLine();
+        }
+        qDebug()<<command;
         qDebug()<<outputLine;
         if (outputLine.contains(QRegExp("device not found")))
         {
@@ -959,13 +978,20 @@ void SettingsWidget::appsBackupFolderExists()
         }
         if (outputLine.contains(QRegExp("No such file or directory")))
         {
-            command="\""+this->sdkPath+"\""+"adb shell busybox mkdir \""+newAppsBackupFolder+"\"";
-            qDebug()<<command;
+            command="\""+this->sdkPath+"\""+"adb shell su -c 'busybox mkdir \""+newAppsBackupFolder+"\"'";
             sdcard->start(command);
             sdcard->waitForFinished(-1);
             outputLine=sdcard->readLine();
+            if (outputLine.contains("su: not found"))
+            {
+                command="\""+this->sdkPath+"\""+"adb shell busybox mkdir \""+newAppsBackupFolder+"\"";
+                sdcard->start(command);
+                sdcard->waitForFinished(-1);
+                outputLine=sdcard->readLine();
+            }
             sdcard->terminate();
             delete sdcard;
+            qDebug()<<command;
             if (outputLine.contains(QRegExp("can't create directory")))
                 QMessageBox::critical(this,"Backup Apps on Phone:","Can't create "  "\"" + newAppsBackupFolder + "\""  "\nCheck path entered and make sure you are allowed to create folders!");
         }

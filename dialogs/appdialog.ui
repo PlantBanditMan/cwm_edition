@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string notr="true"/>
   </property>
+  <property name="windowIcon">
+   <iconset resource="../zasoby.qrc">
+    <normaloff>:/icons/apps.png</normaloff>:/icons/apps.png</iconset>
+  </property>
   <property name="modal">
    <bool>true</bool>
   </property>
@@ -171,6 +175,8 @@
    </layout>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="../zasoby.qrc"/>
+ </resources>
  <connections/>
 </ui>

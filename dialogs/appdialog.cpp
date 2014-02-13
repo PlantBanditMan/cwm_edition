@@ -411,6 +411,7 @@ void appDialog::nextApp(App app)
 {
     QTableWidgetItem *item = new QTableWidgetItem;
     ui->tableWidget->insertRow(ui->tableWidget->rowCount());
+    while(app.appName.endsWith( '/' )) app.appName.chop(1);
     item->setText(app.appName);
     ui->tableWidget->setItem(ui->tableWidget->rowCount()-1,1,item);
     item = new QTableWidgetItem;
@@ -444,21 +445,41 @@ void ThreadBackup::run()
     }
     else
        onsdcard = true;
-    proces->start("\"" + this->sdk + "\"" + "adb shell busybox mkdir \"" + codec->toUnicode(appsBackupFolder.toUtf8()) +"\"");
+    proces->start("\"" + this->sdk + "\"" + "adb shell su -c 'busybox mkdir \"" + codec->toUnicode(appsBackupFolder.toUtf8()) +"\"'");
     proces->waitForFinished(-1);
+    if (proces->readAll().contains("su: not found"))
+    {
+        proces->start("\"" + this->sdk + "\"" + "adb shell busybox mkdir \"" + codec->toUnicode(appsBackupFolder.toUtf8()) +"\"");
+        proces->waitForFinished(-1);
+    }
     qDebug()<<"mkdir - "<<proces->readAll();
     while (this->appList.size() > 0)
     {
         app = this->appList.takeFirst();
-        proces->start("\"" + this->sdk + "\"" + "adb shell busybox mkdir \"" + codec->toUnicode(appsBackupFolder.toUtf8()) + codec->toUnicode(app.appName.append("/").toUtf8())+"\"");
+        proces->start("\"" + this->sdk + "\"" + "adb shell su -c 'busybox mkdir \"" + codec->toUnicode(appsBackupFolder.toUtf8()) + codec->toUnicode(app.appName.append("/").toUtf8())+"\"'");
         proces->waitForFinished(-1);
-        emit this->nextApp(app);
-        proces->start("\""+this->sdk+"\""+"adb shell busybox echo -e \"app.name="+codec->toUnicode(app.appName.left(app.appName.size()-1).toUtf8())+"\" > \""+ codec->toUnicode(appsBackupFolder.toUtf8())+codec->toUnicode(app.appName.toUtf8())+codec->toUnicode(app.packageName.toUtf8())+".txt\"");
-        proces->waitForFinished(-1);
-        proces->start("\""+this->sdk+"\""+"adb shell busybox echo -e \"app.size="+app.appSize+"\" >> \""+ codec->toUnicode(appsBackupFolder.toUtf8())+codec->toUnicode(app.appName.toUtf8())+codec->toUnicode(app.packageName.toUtf8())+".txt\"");
-        proces->waitForFinished(-1);
-        proces->start("\""+this->sdk+"\""+"adb shell busybox echo -e \"app.version="+app.appVersion+"\" >> \""+ codec->toUnicode(appsBackupFolder.toUtf8())+codec->toUnicode(app.appName.toUtf8())+codec->toUnicode(app.packageName.toUtf8())+".txt\"");
-        proces->waitForFinished(-1);
+        if (proces->readAll().contains("su: not found"))
+        {
+            proces->start("\"" + this->sdk + "\"" + "adb shell busybox mkdir \"" + codec->toUnicode(appsBackupFolder.toUtf8()) + codec->toUnicode(app.appName.append("/").toUtf8())+"\"");
+            proces->waitForFinished(-1);
+            emit this->nextApp(app);
+            proces->start("\""+this->sdk+"\""+"adb shell busybox echo -e \"app.name="+codec->toUnicode(app.appName.left(app.appName.size()-1).toUtf8())+"\" > \""+ codec->toUnicode(appsBackupFolder.toUtf8())+codec->toUnicode(app.appName.toUtf8())+codec->toUnicode(app.packageName.toUtf8())+".txt\"");
+            proces->waitForFinished(-1);
+            proces->start("\""+this->sdk+"\""+"adb shell busybox echo -e \"app.size="+app.appSize+"\" >> \""+ codec->toUnicode(appsBackupFolder.toUtf8())+codec->toUnicode(app.appName.toUtf8())+codec->toUnicode(app.packageName.toUtf8())+".txt\"");
+            proces->waitForFinished(-1);
+            proces->start("\""+this->sdk+"\""+"adb shell busybox echo -e \"app.version="+app.appVersion+"\" >> \""+ codec->toUnicode(appsBackupFolder.toUtf8())+codec->toUnicode(app.appName.toUtf8())+codec->toUnicode(app.packageName.toUtf8())+".txt\"");
+            proces->waitForFinished(-1);
+        }
+        else
+        {
+            emit this->nextApp(app);
+            proces->start("\""+this->sdk+"\""+"adb shell su -c 'busybox echo -e \"app.name="+codec->toUnicode(app.appName.left(app.appName.size()-1).toUtf8())+"\" > \""+ codec->toUnicode(appsBackupFolder.toUtf8())+codec->toUnicode(app.appName.toUtf8())+codec->toUnicode(app.packageName.toUtf8())+".txt\"'");
+            proces->waitForFinished(-1);
+            proces->start("\""+this->sdk+"\""+"adb shell su -c 'busybox echo -e \"app.size="+app.appSize+"\" >> \""+ codec->toUnicode(appsBackupFolder.toUtf8())+codec->toUnicode(app.appName.toUtf8())+codec->toUnicode(app.packageName.toUtf8())+".txt\"'");
+            proces->waitForFinished(-1);
+            proces->start("\""+this->sdk+"\""+"adb shell su -c 'busybox echo -e \"app.version="+app.appVersion+"\" >> \""+ codec->toUnicode(appsBackupFolder.toUtf8())+codec->toUnicode(app.appName.toUtf8())+codec->toUnicode(app.packageName.toUtf8())+".txt\"'");
+            proces->waitForFinished(-1);
+        }
         ba = settings.value("apps/"+app.packageName+"/icon").toByteArray();
         if (onsdcard == false)
         {
@@ -484,9 +505,15 @@ void ThreadBackup::run()
         }
         if (this->withData)
         {
-            proces->start("\""+this->sdk+"\""+"adb shell busybox tar -zchf \"" + codec->toUnicode(appsBackupFolder.toUtf8())+codec->toUnicode(app.appName.toUtf8())+codec->toUnicode(app.packageName.toUtf8())+".DATA.tar.gz\" \"/data/data/"+codec->toUnicode(app.packageName.toUtf8())+"\"");
+            proces->start("\""+this->sdk+"\""+"adb shell su -c 'busybox tar -zchf \"" + codec->toUnicode(appsBackupFolder.toUtf8())+codec->toUnicode(app.appName.toUtf8())+codec->toUnicode(app.packageName.toUtf8())+".DATA.tar.gz\" \"/data/data/"+codec->toUnicode(app.packageName.toUtf8())+"\"'");
             proces->waitForFinished(-1);
             output = proces->readAll();
+            if (output.contains("su: not found"))
+            {
+                proces->start("\""+this->sdk+"\""+"adb shell busybox tar -zchf \"" + codec->toUnicode(appsBackupFolder.toUtf8())+codec->toUnicode(app.appName.toUtf8())+codec->toUnicode(app.packageName.toUtf8())+".DATA.tar.gz\" \"/data/data/"+codec->toUnicode(app.packageName.toUtf8())+"\"");
+                proces->waitForFinished(-1);
+                output = proces->readAll();
+            }
             qDebug()<<"Backup app - "<<output;
         }
         if (this->withApk)
@@ -494,9 +521,15 @@ void ThreadBackup::run()
             if (onsdcard == false)
                 proces->start("\""+this->sdk+"\""+"adb pull \""+app.appFile+ "\" \"" + backuponpc+app.appName+app.packageName+".apk\"");
             else
-                proces->start("\""+this->sdk+"\""+"adb shell busybox cp \""+codec->toUnicode(app.appFile.toUtf8())+ "\" \"" + codec->toUnicode(appsBackupFolder.toUtf8())+codec->toUnicode(app.appName.toUtf8())+codec->toUnicode(app.packageName.toUtf8())+".apk\"");
+                proces->start("\""+this->sdk+"\""+"adb shell su -c 'busybox cp \""+codec->toUnicode(app.appFile.toUtf8())+ "\" \"" + codec->toUnicode(appsBackupFolder.toUtf8())+codec->toUnicode(app.appName.toUtf8())+codec->toUnicode(app.packageName.toUtf8())+".apk\"'");
             proces->waitForFinished(-1);
             output = proces->readAll();
+            if (output.contains("su: not found"))
+            {
+                proces->start("\""+this->sdk+"\""+"adb shell busybox cp \""+codec->toUnicode(app.appFile.toUtf8())+ "\" \"" + codec->toUnicode(appsBackupFolder.toUtf8())+codec->toUnicode(app.appName.toUtf8())+codec->toUnicode(app.packageName.toUtf8())+".apk\"");
+                proces->waitForFinished(-1);
+                output = proces->readAll();
+            }
             qDebug()<<"Backup app - "<<output;
         }
         if (onsdcard == false)
@@ -505,9 +538,15 @@ void ThreadBackup::run()
             proces->waitForFinished(-1);
             output = proces->readAll();
             qDebug()<<"Backup app - adb pull "<<output;
-            proces->start("\""+this->sdk+"\""+"adb shell busybox rm -r \""+codec->toUnicode(appsBackupFolder.toUtf8()) + codec->toUnicode(app.appName.toUtf8())+"\"");
+            proces->start("\""+this->sdk+"\""+"adb shell su -c 'busybox rm -r \""+codec->toUnicode(appsBackupFolder.toUtf8()) + codec->toUnicode(app.appName.toUtf8())+"\"'");
             proces->waitForFinished(-1);
             output = proces->readAll();
+            if (output.contains("su: not found"))
+            {
+                proces->start("\""+this->sdk+"\""+"adb shell busybox rm -r \""+codec->toUnicode(appsBackupFolder.toUtf8()) + codec->toUnicode(app.appName.toUtf8())+"\"");
+                proces->waitForFinished(-1);
+                output = proces->readAll();
+            }
             qDebug()<<"Backup app - rm -r "<<output;
             qDebug()<<"3----------Backup app on PC - "<<backuponpc<<"-----"<<appsBackupFolder;
         }
@@ -515,9 +554,15 @@ void ThreadBackup::run()
     }
         if (onsdcard == false)
         {
-        proces->start("\""+this->sdk+"\""+"adb shell busybox rm -r \""+codec->toUnicode(appsBackupFolder.toUtf8())+"\"");
+        proces->start("\""+this->sdk+"\""+"adb shell su -c 'busybox rm -r \""+codec->toUnicode(appsBackupFolder.toUtf8())+"\"'");
         proces->waitForFinished(-1);
         output = proces->readAll();
+        if (output.contains("su: not found"))
+        {
+            proces->start("\""+this->sdk+"\""+"adb shell busybox rm -r \""+codec->toUnicode(appsBackupFolder.toUtf8())+"\"");
+            proces->waitForFinished(-1);
+            output = proces->readAll();
+        }
         qDebug()<<"Backup app - rm -r "<<output;
         qDebug()<<"3----------Backup app on PC - "<<backuponpc<<"-----"<<appsBackupFolder;
         }
@@ -539,8 +584,13 @@ void ThreadRestore::run()
     {
         backuponpc = appsBackupFolder.append("/");
         appsBackupFolder = "/sdcard/tmpAppsBackup/";
-        proces->start("\"" + this->sdk + "\"" + "adb shell busybox mkdir \"" + codec->toUnicode(appsBackupFolder.toUtf8()) +"\"");
+        proces->start("\"" + this->sdk + "\"" + "adb shell su -c 'busybox mkdir \"" + codec->toUnicode(appsBackupFolder.toUtf8()) +"\"'");
         proces->waitForFinished(-1);
+        if (proces->readAll().contains("su: not found"))
+        {
+            proces->start("\"" + this->sdk + "\"" + "adb shell busybox mkdir \"" + codec->toUnicode(appsBackupFolder.toUtf8()) +"\"");
+            proces->waitForFinished(-1);
+        }
         qDebug()<<"mkdir /sdcard/tmpAppsBackup/ - "<<proces->readAll();
         onsdcard = false;
         qDebug()<<"1----------Backup app on PC - "<<backuponpc<<"-----"<<appsBackupFolder;
@@ -555,8 +605,13 @@ void ThreadRestore::run()
         namedir = app.appName.append("/");
         if (onsdcard == false)
         {
-            proces->start("\"" + this->sdk + "\"" + "adb shell busybox mkdir \"" + codec->toUnicode(appsBackupFolder.toUtf8()) + codec->toUnicode(namedir.toUtf8())+"\"");
+            proces->start("\"" + this->sdk + "\"" + "adb shell su -c 'busybox mkdir \"" + codec->toUnicode(appsBackupFolder.toUtf8()) + codec->toUnicode(namedir.toUtf8())+"\"'");
             proces->waitForFinished(-1);
+            if (proces->readAll().contains("su: not found"))
+            {
+                proces->start("\"" + this->sdk + "\"" + "adb shell busybox mkdir \"" + codec->toUnicode(appsBackupFolder.toUtf8()) + codec->toUnicode(namedir.toUtf8())+"\"");
+                proces->waitForFinished(-1);
+            }
             qDebug()<<"mkdir /sdcard/tmpAppsBackup/appName/ - "<<proces->readAll();
         }
         if (this->withApk)
@@ -566,22 +621,44 @@ void ThreadRestore::run()
                 proces->start("\""+this->sdk+"\""+"adb push \"" + backuponpc + namedir +app.packageName + ".apk\" \""+appsBackupFolder + namedir + "\"");
                 proces->waitForFinished(-1);
             }
-            proces->start("\""+this->sdk+"\""+"adb shell pm install \"" + codec->toUnicode(appsBackupFolder.toUtf8()) + codec->toUnicode(namedir.toUtf8()) +codec->toUnicode(app.packageName.toUtf8()) + ".apk\"");
+            proces->start("\""+this->sdk+"\""+"adb shell su -c 'pm install \"" + codec->toUnicode(appsBackupFolder.toUtf8()) + codec->toUnicode(namedir.toUtf8()) +codec->toUnicode(app.packageName.toUtf8()) + ".apk\"'");
             proces->waitForFinished(-1);
             output = proces->readAll();
+            if (proces->readAll().contains("su: not found"))
+            {
+                proces->start("\""+this->sdk+"\""+"adb shell pm install \"" + codec->toUnicode(appsBackupFolder.toUtf8()) + codec->toUnicode(namedir.toUtf8()) +codec->toUnicode(app.packageName.toUtf8()) + ".apk\"");
+                proces->waitForFinished(-1);
+                output = proces->readAll();
+            }
             qDebug()<<"Restore pm - "<<output;
             if (output.contains("Failure [INSTALL_FAILED_INSUFFICIENT_STORAGE]"))
             {
-                proces->start("\""+this->sdk+"\""+"adb shell busybox cp \"" + codec->toUnicode(appsBackupFolder.toUtf8()) + codec->toUnicode(namedir.toUtf8()) +codec->toUnicode(app.packageName.toUtf8()) + ".apk\" /data/local/tmp/");
+                proces->start("\""+this->sdk+"\""+"adb shell su -c 'busybox cp \"" + codec->toUnicode(appsBackupFolder.toUtf8()) + codec->toUnicode(namedir.toUtf8()) +codec->toUnicode(app.packageName.toUtf8()) + ".apk\" /data/local/tmp/"+"'");
                 proces->waitForFinished(-1);
                 output = proces->readAll();
-                qDebug()<<"Restore cp - "<<output;
-                proces->start("\""+this->sdk+"\""+"adb shell pm install /data/local/tmp/" +codec->toUnicode(app.packageName.toUtf8()) + ".apk");
-                proces->waitForFinished(-1);
-                output = proces->readAll();
-                qDebug()<<"Restore pm - "<<output;
-                proces->start("\""+this->sdk+"\""+"adb shell rm -f /data/local/tmp/" +codec->toUnicode(app.packageName.toUtf8()) + ".apk");
-                proces->waitForFinished(-1);
+                if (proces->readAll().contains("su: not found"))
+                {
+                    proces->start("\""+this->sdk+"\""+"adb shell busybox cp \"" + codec->toUnicode(appsBackupFolder.toUtf8()) + codec->toUnicode(namedir.toUtf8()) +codec->toUnicode(app.packageName.toUtf8()) + ".apk\" /data/local/tmp/");
+                    proces->waitForFinished(-1);
+                    output = proces->readAll();
+                    qDebug()<<"Restore cp - "<<output;
+                    proces->start("\""+this->sdk+"\""+"adb shell pm install /data/local/tmp/" +codec->toUnicode(app.packageName.toUtf8()) + ".apk");
+                    proces->waitForFinished(-1);
+                    output = proces->readAll();
+                    qDebug()<<"Restore pm - "<<output;
+                    proces->start("\""+this->sdk+"\""+"adb shell rm -f /data/local/tmp/" +codec->toUnicode(app.packageName.toUtf8()) + ".apk");
+                    proces->waitForFinished(-1);
+                }
+                else
+                {
+                    qDebug()<<"Restore cp - "<<output;
+                    proces->start("\""+this->sdk+"\""+"adb shell su -c 'pm install /data/local/tmp/" +codec->toUnicode(app.packageName.toUtf8()) + ".apk'");
+                    proces->waitForFinished(-1);
+                    output = proces->readAll();
+                    qDebug()<<"Restore pm - "<<output;
+                    proces->start("\""+this->sdk+"\""+"adb shell su -c 'rm -f /data/local/tmp/" +codec->toUnicode(app.packageName.toUtf8()) + ".apk'");
+                    proces->waitForFinished(-1);
+                }
             }
             if (output.contains("Failure"))
             {
@@ -593,34 +670,64 @@ void ThreadRestore::run()
             {
                 if (this->withData)
                 {
-                    proces->start("\""+this->sdk+"\""+"adb shell busybox rm -rf /data/data/"+codec->toUnicode(app.packageName.toUtf8()));
+                    proces->start("\""+this->sdk+"\""+"adb shell su -c 'busybox rm -rf /data/data/"+codec->toUnicode(app.packageName.toUtf8())+"'");
                     proces->waitForFinished(-1);
                     output = proces->readAll();
+                    if (proces->readAll().contains("su: not found"))
+                    {
+                        proces->start("\""+this->sdk+"\""+"adb shell busybox rm -rf /data/data/"+codec->toUnicode(app.packageName.toUtf8()));
+                        proces->waitForFinished(-1);
+                        output = proces->readAll();
+                    }
                     qDebug()<<"Restore rm - "<<output;
                     if (onsdcard == false)
                     {
                         proces->start("\""+this->sdk+"\""+"adb push \"" + backuponpc + namedir +app.packageName + ".DATA.tar.gz\" \""+appsBackupFolder + namedir + "\"");
                         proces->waitForFinished(-1);
                     }
-                    proces->start("\""+this->sdk+"\""+"adb shell busybox tar -xzf \""+codec->toUnicode(appsBackupFolder.toUtf8()) + codec->toUnicode(namedir.toUtf8()) +codec->toUnicode(app.packageName.toUtf8())+".DATA.tar.gz\" -C /");
+                    proces->start("\""+this->sdk+"\""+"adb shell su -c 'busybox tar -xzf \""+codec->toUnicode(appsBackupFolder.toUtf8()) + codec->toUnicode(namedir.toUtf8()) +codec->toUnicode(app.packageName.toUtf8())+".DATA.tar.gz\" -C /"+"'");
                     proces->waitForFinished(-1);
                     output = proces->readAll();
+                    if (proces->readAll().contains("su: not found"))
+                    {
+                        proces->start("\""+this->sdk+"\""+"adb shell busybox tar -xzf \""+codec->toUnicode(appsBackupFolder.toUtf8()) + codec->toUnicode(namedir.toUtf8()) +codec->toUnicode(app.packageName.toUtf8())+".DATA.tar.gz\" -C /");
+                        proces->waitForFinished(-1);
+                        output = proces->readAll();
+                    }
                     qDebug()<<"Restore tar - "<<output;
-                    proces->start("\""+this->sdk+"\""+"adb shell \"busybox cat /data/system/packages.xml | busybox grep '^<package.*"+codec->toUnicode(app.packageName.toUtf8())+"'\"");
+                    proces->start("\""+this->sdk+"\""+"adb shell su -c '\"busybox cat /data/system/packages.xml | busybox grep '^<package.*"+codec->toUnicode(app.packageName.toUtf8())+"'\"'");
                     proces->waitForFinished(-1);
                     output = proces->readAll();
+                    if (proces->readAll().contains("su: not found"))
+                    {
+                        proces->start("\""+this->sdk+"\""+"adb shell \"busybox cat /data/system/packages.xml | busybox grep '^<package.*"+codec->toUnicode(app.packageName.toUtf8())+"'\"");
+                        proces->waitForFinished(-1);
+                        output = proces->readAll();
+                    }
                     qDebug()<<"Restore cat - "<<output;
                     int start = output.indexOf("serId=")+7;
                     if (start > 7)
                     {
                         userId = output.mid(start, output.indexOf("\"", start) - start);
-                        proces->start("\""+this->sdk+"\""+"adb shell busybox chown -R "+userId+":"+userId+" /data/data/"+codec->toUnicode(app.packageName.toUtf8()));
+                        proces->start("\""+this->sdk+"\""+"adb shell su -c 'busybox chown -R "+userId+":"+userId+" /data/data/"+codec->toUnicode(app.packageName.toUtf8())+"'");
                         proces->waitForFinished(-1);
                         output = proces->readAll();
+                        if (proces->readAll().contains("su: not found"))
+                        {
+                            proces->start("\""+this->sdk+"\""+"adb shell busybox chown -R "+userId+":"+userId+" /data/data/"+codec->toUnicode(app.packageName.toUtf8()));
+                            proces->waitForFinished(-1);
+                            output = proces->readAll();
+                        }
                         qDebug()<<"Restore chown - "<<output;
-                        proces->start("\""+this->sdk+"\""+"adb shell busybox chmod -R 775 /data/data/"+codec->toUnicode(app.packageName.toUtf8()));
+                        proces->start("\""+this->sdk+"\""+"adb shell su -c 'busybox chmod -R 775 /data/data/"+codec->toUnicode(app.packageName.toUtf8())+"'");
                         proces->waitForFinished(-1);
                         output = proces->readAll();
+                        if (proces->readAll().contains("su: not found"))
+                        {
+                            proces->start("\""+this->sdk+"\""+"adb shell busybox chmod -R 775 /data/data/"+codec->toUnicode(app.packageName.toUtf8()));
+                            proces->waitForFinished(-1);
+                            output = proces->readAll();
+                        }
                         qDebug()<<"Restore chmod - "<<output;
                         emit this->restored(tr("SUCCESS"), "");
                     }
@@ -635,34 +742,64 @@ void ThreadRestore::run()
         }
         else if (this->withData)
         {
-            proces->start("\""+this->sdk+"\""+"adb shell busybox rm -rf /data/data/"+codec->toUnicode(app.packageName.toUtf8()));
+            proces->start("\""+this->sdk+"\""+"adb shell su -c 'busybox rm -rf /data/data/"+codec->toUnicode(app.packageName.toUtf8())+"'");
             proces->waitForFinished(-1);
             output = proces->readAll();
+            if (proces->readAll().contains("su: not found"))
+            {
+                proces->start("\""+this->sdk+"\""+"adb shell 'busybox rm -rf /data/data/"+codec->toUnicode(app.packageName.toUtf8()));
+                proces->waitForFinished(-1);
+                output = proces->readAll();
+            }
             qDebug()<<"Restore rm - "<<output;
             if (onsdcard == false)
             {
                 proces->start("\""+this->sdk+"\""+"adb push \"" + backuponpc + namedir +app.packageName + ".DATA.tar.gz\" \""+appsBackupFolder + namedir + "\"");
                 proces->waitForFinished(-1);
             }
-            proces->start("\""+this->sdk+"\""+"adb shell busybox tar -xzf \""+codec->toUnicode(appsBackupFolder.toUtf8()) + codec->toUnicode(namedir.toUtf8()) +codec->toUnicode(app.packageName.toUtf8())+".DATA.tar.gz\" -C /");
+            proces->start("\""+this->sdk+"\""+"adb shell su -c 'busybox tar -xzf \""+codec->toUnicode(appsBackupFolder.toUtf8()) + codec->toUnicode(namedir.toUtf8()) +codec->toUnicode(app.packageName.toUtf8())+".DATA.tar.gz\" -C /"+"'");
             proces->waitForFinished(-1);
             output = proces->readAll();
+            if (proces->readAll().contains("su: not found"))
+            {
+                proces->start("\""+this->sdk+"\""+"adb shell busybox tar -xzf \""+codec->toUnicode(appsBackupFolder.toUtf8()) + codec->toUnicode(namedir.toUtf8()) +codec->toUnicode(app.packageName.toUtf8())+".DATA.tar.gz\" -C /");
+                proces->waitForFinished(-1);
+                output = proces->readAll();
+            }
             qDebug()<<"Restore tar - "<<output;
-            proces->start("\""+this->sdk+"\""+"adb shell \"busybox cat /data/system/packages.xml | busybox grep '^<package.*"+codec->toUnicode(app.packageName.toUtf8())+"'\"");
+            proces->start("\""+this->sdk+"\""+"adb shell su -c '\"busybox cat /data/system/packages.xml | busybox grep '^<package.*"+codec->toUnicode(app.packageName.toUtf8())+"'\"'");
             proces->waitForFinished(-1);
             output = proces->readAll();
+            if (proces->readAll().contains("su: not found"))
+            {
+                proces->start("\""+this->sdk+"\""+"adb shell \"busybox cat /data/system/packages.xml | busybox grep '^<package.*"+codec->toUnicode(app.packageName.toUtf8())+"'\"");
+                proces->waitForFinished(-1);
+                output = proces->readAll();
+            }
             qDebug()<<"Restore cat - "<<output;
             int start = output.indexOf("serId=")+7;
             if (start > 7)
             {
                 userId = output.mid(start, output.indexOf("\"", start) - start);
-                proces->start("\""+this->sdk+"\""+"adb shell busybox chown -R "+userId+":"+userId+" /data/data/"+codec->toUnicode(app.packageName.toUtf8()));
+                proces->start("\""+this->sdk+"\""+"adb shell su -c 'busybox chown -R "+userId+":"+userId+" /data/data/"+codec->toUnicode(app.packageName.toUtf8())+"'");
                 proces->waitForFinished(-1);
                 output = proces->readAll();
+                if (proces->readAll().contains("su: not found"))
+                {
+                    proces->start("\""+this->sdk+"\""+"adb shell busybox chown -R "+userId+":"+userId+" /data/data/"+codec->toUnicode(app.packageName.toUtf8()));
+                    proces->waitForFinished(-1);
+                    output = proces->readAll();
+                }
                 qDebug()<<"Restore chown - "<<output;
-                proces->start("\""+this->sdk+"\""+"adb shell busybox chmod -R 775 /data/data/"+codec->toUnicode(app.packageName.toUtf8()));
+                proces->start("\""+this->sdk+"\""+"adb shell su -c 'busybox chmod -R 775 /data/data/"+codec->toUnicode(app.packageName.toUtf8())+"'");
                 proces->waitForFinished(-1);
                 output = proces->readAll();
+                if (proces->readAll().contains("su: not found"))
+                {
+                    proces->start("\""+this->sdk+"\""+"adb shell busybox chmod -R 775 /data/data/"+codec->toUnicode(app.packageName.toUtf8()));
+                    proces->waitForFinished(-1);
+                    output = proces->readAll();
+                }
                 qDebug()<<"Restore chmod - "<<output;
                 emit this->restored(tr("SUCCESS"), "");
             }
@@ -673,17 +810,29 @@ void ThreadRestore::run()
         }
         if (onsdcard == false)
         {
-            proces->start("\""+this->sdk+"\""+"adb shell busybox rm -r \"" + codec->toUnicode(appsBackupFolder.toUtf8()) + codec->toUnicode(namedir.toUtf8())+"\"");
+            proces->start("\""+this->sdk+"\""+"adb shell su -c 'busybox rm -r \"" + codec->toUnicode(appsBackupFolder.toUtf8()) + codec->toUnicode(namedir.toUtf8())+"\"'");
             proces->waitForFinished(-1);
             output = proces->readAll();
+            if (proces->readAll().contains("su: not found"))
+            {
+                proces->start("\""+this->sdk+"\""+"adb shell busybox rm -r \"" + codec->toUnicode(appsBackupFolder.toUtf8()) + codec->toUnicode(namedir.toUtf8())+"\"");
+                proces->waitForFinished(-1);
+                output = proces->readAll();
+            }
             qDebug()<<"Backup app - rm -r "<<output;
         }
     }
     if (onsdcard == false)
     {
-        proces->start("\""+this->sdk+"\""+"adb shell busybox rm -r \""+codec->toUnicode(appsBackupFolder.toUtf8())+"\"");
+        proces->start("\""+this->sdk+"\""+"adb shell su -c 'busybox rm -r \""+codec->toUnicode(appsBackupFolder.toUtf8())+"\"'");
         proces->waitForFinished(-1);
         output = proces->readAll();
+        if (proces->readAll().contains("su: not found"))
+        {
+            proces->start("\""+this->sdk+"\""+"adb shell busybox rm -r \""+codec->toUnicode(appsBackupFolder.toUtf8())+"\"");
+            proces->waitForFinished(-1);
+            output = proces->readAll();
+        }
         qDebug()<<"Backup app - rm -r "<<output;
     }
     emit this->restored("finished", "");
@@ -739,9 +888,15 @@ void ThreadUninstall::run()
 
         if (this->system)
         {
-            proces->start("\""+this->sdk+"\""+"adb shell busybox mount -o remount,rw /system");
+            proces->start("\""+this->sdk+"\""+"adb shell su -c 'busybox mount -o remount,rw /system'");
             proces->waitForFinished(-1);
             output = proces->readAll();
+            if (proces->readAll().contains("su: not found"))
+            {
+                proces->start("\""+this->sdk+"\""+"adb shell busybox mount /system");
+                proces->waitForFinished(-1);
+                output = proces->readAll();
+
             qDebug()<<"Remove system - "<<output;
             if (this->keepData)
             {
@@ -751,6 +906,19 @@ void ThreadUninstall::run()
                 qDebug()<<"Remove system - "<<output;
             }
             proces->start("\""+this->sdk+"\""+"adb shell busybox rm -rf "+codec->toUnicode(app.appFile.toUtf8()));
+            }
+            else
+            {
+                qDebug()<<"Remove system - "<<output;
+                if (this->keepData)
+                {
+                    proces->start("\""+this->sdk+"\""+"adb shell su -c 'busybox rm -rf /data/data/"+codec->toUnicode(app.packageName.toUtf8())+"'");
+                    proces->waitForFinished(-1);
+                    output = proces->readAll();
+                    qDebug()<<"Remove system - "<<output;
+                }
+                proces->start("\""+this->sdk+"\""+"adb shell su -c 'busybox rm -rf "+codec->toUnicode(app.appFile.toUtf8())+"'");
+            }
         }
         else
         {

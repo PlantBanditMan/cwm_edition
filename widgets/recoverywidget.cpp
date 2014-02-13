@@ -37,7 +37,7 @@ RecoveryWidget::RecoveryWidget(QWidget *parent) :
     QProcess *nandroid = new QProcess;
     QString output, tmp;
     QStringList tmpLines;
-    nandroid->start("\"" + sdk + "\"adb shell find /sbin -name nandroid-mobile*.sh");
+    nandroid->start("\"" + sdk + "\"adb shell su -c 'find /sbin -name nandroid-mobile*.sh'");
     nandroid->waitForFinished(-1);
     output = nandroid->readAll();
     tmpLines = output.split("\n", QString::SkipEmptyParts);
@@ -68,7 +68,7 @@ RecoveryWidget::RecoveryWidget(QWidget *parent) :
 
     QProcess *process=new QProcess();
 
-    process->start("\""+sdk+"\"adb shell ls /sbin/wipe");
+    process->start("\""+sdk+"\"adb shell su -c 'ls /sbin/wipe'");
     process->waitForFinished(-1);
     tmp = process->readAll();
     if (tmp.contains("No such file"))
@@ -78,7 +78,7 @@ RecoveryWidget::RecoveryWidget(QWidget *parent) :
     process->terminate();
     delete process;
     process=new QProcess();
-    process->start("\""+sdk+"\"adb shell ls /sbin/ums_toggle");
+    process->start("\""+sdk+"\"adb shell su -c 'ls /sbin/ums_toggle'");
     process->waitForFinished(-1);
     tmp = process->readAll();
     if (tmp.contains("No such file"))
@@ -89,7 +89,7 @@ RecoveryWidget::RecoveryWidget(QWidget *parent) :
     delete process;
 
     process=new QProcess();
-    process->start("\""+sdk+"\"adb shell ls /sbin/fix_permissions");
+    process->start("\""+sdk+"\"adb shell su -c 'ls /sbin/fix_permissions'");
     process->waitForFinished(-1);
     tmp = process->readAll();
     if (tmp.contains("No such file"))
@@ -141,7 +141,7 @@ void RecoveryWidget::changeEvent(QEvent *e)
 void RecoveryWidget::fixUID()
 {
     this->procesNandroid.setProcessChannelMode(QProcess::MergedChannels);
-    this->procesNandroid.start("\"" + sdk + "\"adb shell fix_permissions");
+    this->procesNandroid.start("\"" + sdk + "\"adb shell su -c 'fix_permissions'");
     connect(&this->procesNandroid, SIGNAL(readyRead()), this, SLOT(fixUIDoutput()));
     connect(&this->procesNandroid, SIGNAL(finished(int)), this, SLOT(fixUIDfinished()));
     this->ui->stackedRecovery->setCurrentWidget(this->ui->pageFixUID);
@@ -184,7 +184,7 @@ void RecoveryWidget::flashZip()
     this->romFileName = fInfo.fileName();
 
     QProcess tmp;
-    tmp.start("\"" + sdk + "\"adb shell mount /sdcard");
+    tmp.start("\"" + sdk + "\"adb shell su -c 'mount /sdcard'");
     tmp.waitForFinished(-1);
     tmp.terminate();
 //    if (this->dialog != NULL)
@@ -207,7 +207,7 @@ void RecoveryWidget::flashZipCopied()
 {
     disconnect(this->dialog,SIGNAL(finished(int)),this,SLOT(flashZipCopied()));
 
-    this->procesNandroid.start("\"" + sdk + "\"adb shell echo '--update_package=/sdcard/" + this->romFileName + "'>/cache/recovery/command");
+    this->procesNandroid.start("\"" + sdk + "\"adb shell su -c 'echo '--update_package=/sdcard/" + this->romFileName + "'>/cache/recovery/command'");
 
     this->ui->textFlashZIP->append(tr("Writing commands...."));
 
@@ -217,7 +217,7 @@ void RecoveryWidget::flashZipCopied()
 void RecoveryWidget::flashZipReboot()
 {
     this->ui->textFlashZIP->append(tr("Rebooting...."));
-    this->procesNandroid.start("\"" + sdk + "\"adb shell reboot recovery");
+    this->procesNandroid.start("\"" + sdk + "\"adb shell su -c 'reboot recovery'");
     disconnect(&this->procesNandroid, SIGNAL(finished(int)), this, SLOT(flashZipReboot()));
 }
 void RecoveryWidget::mountSDcard()
@@ -226,9 +226,9 @@ void RecoveryWidget::mountSDcard()
     process->setProcessChannelMode(QProcess::MergedChannels);
     QString tmp;
     if (this->recoverySDmounted)
-        process->start("\""+sdk+"\"adb shell ums_toggle off");
+        process->start("\""+sdk+"\"adb shell su -c 'ums_toggle off'");
     else
-        process->start("\""+sdk+"\"adb shell ums_toggle on");
+        process->start("\""+sdk+"\"adb shell su -c 'ums_toggle on'");
     this->recoverySDmounted = !this->recoverySDmounted;
     process->waitForFinished(-1);
     tmp = process->readAll();
@@ -251,7 +251,7 @@ void RecoveryWidget::mountSDcard()
 void RecoveryWidget::nandroidBackup()
 {
     QString command;
-    command = "adb shell " + this->nandroidScript + " --backup";
+    command = "adb shell su -c '" + this->nandroidScript + " --backup'";
     if (this->ui->checkNandroidBackupPath->isChecked())
         command.append(" --path " + this->ui->editNandroidBackupPath->text());
     if (this->ui->checkNandroidBackupString->isChecked())
@@ -333,7 +333,7 @@ void RecoveryWidget::nandroidBackupPage()
 void RecoveryWidget::nandroidRestore()
 {
     QString command, tmp;
-    command = "adb shell " + this->nandroidScript + "--restore";
+    command = "adb shell su -c '" + this->nandroidScript + "--restore'";
     if (this->ui->checkNandroidRestoreExt->isChecked() && this->ui->checkNandroidRestoreExt->isEnabled())
         command.append(" -e");
     if (!this->ui->checkNandroidRestoreBoot->isChecked() && this->ui->checkNandroidRestoreBoot->isEnabled())
@@ -365,7 +365,7 @@ void RecoveryWidget::nandroidRestoreCombo()
     QString tmpStr;
 
     QProcess tmp;
-    tmp.start("\""+sdk+"\"adb shell mount /sdcard");
+    tmp.start("\""+sdk+"\"adb shell su -c 'mount /sdcard'");
     tmp.waitForFinished(-1);
     tmp.terminate();
     tmpStr = this->ui->comboNandroidRestore->currentText();
@@ -443,7 +443,7 @@ void RecoveryWidget::nandroidRestoreCombo()
         this->ui->checkNandroidRestoreExt->setDisabled(true);
     }
 
-    tmp.start("\""+sdk+"\"adb shell umount /sdcard");
+    tmp.start("\""+sdk+"\"adb shell su -c 'umount /sdcard'");
     tmp.waitForFinished(-1);
     tmp.terminate();
 }
@@ -513,7 +513,7 @@ void RecoveryWidget::nandroidRestorePage()
     this->ui->stackedRecovery->setCurrentWidget(this->ui->pageNandroidRestore);
     this->ui->textNandroidRestore->append(tr("Looking for backups..."));
     this->procesNandroid.setProcessChannelMode(QProcess::MergedChannels);
-    this->procesNandroid.start("\""+sdk+"\"adb shell nandroid-mobile.sh --listbackup");
+    this->procesNandroid.start("\""+sdk+"\"adb shell su -c 'nandroid-mobile.sh --listbackup'");
     connect(&this->procesNandroid, SIGNAL(finished(int)), this, SLOT(nandroidRestoreFound()));
     //    tmp->waitForFinished(-1);
 
@@ -524,7 +524,7 @@ void RecoveryWidget::wipeBattery()
     QString output;
     QProcess *process=new QProcess();
     process->setProcessChannelMode(QProcess::MergedChannels);
-    process->start("\""+sdk+"\"adb shell wipe battery");
+    process->start("\""+sdk+"\"adb shell su -c 'wipe battery'");
     process->waitForFinished(-1);
     process->terminate();
     output = process->readAll();
@@ -537,7 +537,7 @@ void RecoveryWidget::wipeData()
     if (QMessageBox::question(this, tr("Wipe data"), tr("Are you sure??"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::No)
         return;
     this->procesNandroid.setProcessChannelMode(QProcess::MergedChannels);
-    this->procesNandroid.start("\"" + sdk + "\"adb shell echo \'--wipe_data\'>/cache/recovery/command");
+    this->procesNandroid.start("\"" + sdk + "\"adb shell su -c 'echo \'--wipe_data\'>/cache/recovery/command'");
 
     this->ui->textWipeData->append(tr("Writing commands...."));
 
@@ -548,7 +548,7 @@ void RecoveryWidget::wipeData()
 void RecoveryWidget::wipeDataFinished()
 {
     this->procesNandroid.terminate();
-    this->procesNandroid.start("\"" + sdk + "\"adb shell reboot recovery");
+    this->procesNandroid.start("\"" + sdk + "\"adb shell su -c 'reboot recovery'");
 
     this->ui->textWipeData->append(tr("Rebooting...."));
 

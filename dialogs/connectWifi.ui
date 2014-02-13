@@ -19,6 +19,10 @@
   <property name="windowTitle">
    <string extracomment="Connect wifi dialog title">Connect</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="../zasoby.qrc">
+    <normaloff>:/icons/android.ico</normaloff>:/icons/android.ico</iconset>
+  </property>
   <property name="styleSheet">
    <string notr="true"/>
   </property>
@@ -196,6 +200,8 @@
    </layout>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="../zasoby.qrc"/>
+ </resources>
  <connections/>
 </ui>

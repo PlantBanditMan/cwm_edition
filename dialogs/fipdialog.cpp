@@ -83,11 +83,18 @@ void fipDialog::setData(QString file)
     fileC = file;
     if (!file.isEmpty())
     {
-        QString command="\""+sdk+"\""+"adb shell busybox stat \""+this->codec->toUnicode(fileC.toUtf8())+"\"";
+        QString command="\""+sdk+"\""+"adb shell su -c 'busybox stat \""+this->codec->toUnicode(fileC.toUtf8())+"\"'";
         proces->start(command);
         proces->waitForFinished(-1);
         QString output = proces->readAll();
-        qDebug()<<"\""<<sdk<<"\""<<"adb shell busybox stat \""<<this->codec->toUnicode(fileC.toUtf8())<<"\"";
+        if (output.contains("su: not found"))
+        {
+            command="\""+sdk+"\""+"adb shell busybox stat \""+this->codec->toUnicode(fileC.toUtf8())+"\"";
+            proces->start(command);
+            proces->waitForFinished(-1);
+            output = proces->readAll();
+        }
+        qDebug()<<"\""<<sdk<<"\""<<command;
         qDebug()<<"command output "<<output;
         if (output.contains("stat:") || output.contains("can't stat") || output.contains("error:"))
         {
@@ -104,11 +111,18 @@ void fipDialog::setData(QString file)
         {
             this->ui->editType->setText("Directory");
           //  QProcess *procesdir = new QProcess;
-            QString commandDir="\""+sdk+"\""+"adb shell busybox du -H -s \""+this->codec->toUnicode(fileC.toUtf8())+"\"";
+            QString commandDir="\""+sdk+"\""+"adb shell su -c 'busybox du -H -s \""+this->codec->toUnicode(fileC.toUtf8())+"\"'";
             proces->start(commandDir);
             proces->waitForFinished(-1);
             QString outputDir = proces->readAll();
-            qDebug()<<"\""<<sdk<<"\""<<"adb shell busybox du -H -s \""<<this->codec->toUnicode(fileC.toUtf8())<<"\"";
+            if (outputDir.contains("su: not found"))
+            {
+                commandDir="\""+sdk+"\""+"adb shell busybox du -H -s \""+this->codec->toUnicode(fileC.toUtf8())+"\"";
+                proces->start(commandDir);
+                proces->waitForFinished(-1);
+                outputDir = proces->readAll();
+            }
+            qDebug()<<"\""<<sdk<<"\""<<commandDir;
             qDebug()<<"du outputDir" << outputDir;
             if (outputDir.contains("du:") || outputDir.contains("error:"))
             {
@@ -451,16 +465,28 @@ void fipDialog::applyButtonClicked()
 void fipDialog::okButtonClicked()
 {
     disconnect(ui->buttonApply, SIGNAL(clicked()), this, SLOT(okButtonClicked()));
-    QString chmod = this->getCheckboxesStatus();
+    QString chmod = this->getCheckboxesStatus().append(" \"");
     if (fileC.startsWith("/system"))
     {
-        proces->start("\""+sdk+"\""+"adb shell busybox mount -o remount,rw /system");
+        proces->start("\""+sdk+"\""+"adb shell su -c 'busybox mount -o remount,rw /system'");
         proces->waitForFinished(-1);
+        if (proces->readAll().contains("su: not found"))
+        {
+            proces->start("\""+sdk+"\""+"adb shell busybox mount /system");
+            proces->waitForFinished(-1);
+        }
     }
-    QString commandChmod="\""+sdk+"\"" + "adb shell busybox chmod " + chmod.append(" \"")+this->codec->toUnicode(fileC.toUtf8())+"\"";
+    QString commandChmod="\""+sdk+"\"" + "adb shell su -c 'busybox chmod " + chmod+this->codec->toUnicode(fileC.toUtf8())+"\"'";
     proces->start(commandChmod);
     proces->waitForFinished(-1);
     QString outputChmod = proces->readAll();
+    if (outputChmod.contains("su: not found"))
+    {
+        commandChmod="\""+sdk+"\"" + "adb shell busybox chmod " + chmod+this->codec->toUnicode(fileC.toUtf8())+"\"";
+        proces->start(commandChmod);
+        proces->waitForFinished(-1);
+        outputChmod = proces->readAll();
+    }
     qDebug()<<commandChmod;
     qDebug()<<"command output "<<outputChmod;
     if (outputChmod.contains("chmod:") || outputChmod.contains("error:") || outputChmod.contains("Usage:"))

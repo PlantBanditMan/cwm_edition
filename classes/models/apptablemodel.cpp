@@ -28,6 +28,7 @@ App::App(QObject *parent)
 
 App::App(const App& app)
 {
+    QSettings settings;
     this->appFile = app.appFile;
     this->appFileName = app.appFileName;
     this->appIcon = app.appIcon;
@@ -40,10 +41,14 @@ App::App(const App& app)
     this->qrCode = app.qrCode;
     this->cyrketVer = app.cyrketVer;
     this->date = app.date;
+    if (this->appName.isEmpty())
+        this->appName = settings.value("apps/" + app.packageName + "/appName").toString();
+//            this->appName = this->appFileName;
 }
 
 App& App::operator =(const App& app)
 {
+    QSettings settings;
     this->appFile = app.appFile;
     this->appFileName = app.appFileName;
     this->appIcon = app.appIcon;
@@ -56,6 +61,9 @@ App& App::operator =(const App& app)
     this->qrCode = app.qrCode;
     this->cyrketVer = app.cyrketVer;
     this->date = app.date;
+    if (this->appName.isEmpty())
+        this->appName = settings.value("apps/" + app.packageName + "/appName").toString();
+//        this->appName = this->appFileName;
     return *this;
 }
 
@@ -135,13 +143,15 @@ QVariant AppTableModel::data(const QModelIndex &index, int role) const
     }
     else if (role == Qt::DisplayRole) {
         App app = this->appList.at(index.row());
-
+        QSettings settings;
         int col = index.column();
         switch (col)
         {
         case 0:
             return "";
         case 1:
+            if (app.appName.isEmpty())
+                app.appName = settings.value("apps/" + app.packageName + "/appName").toString();
             return app.appName;
         case 2:
             tmp = app.appVersion;
@@ -220,7 +230,7 @@ bool AppTableModel::setData(const QModelIndex &index, const QVariant &value, int
         int row = index.row();
 
         App app = this->appList.value(row);
-
+        QSettings settings;
         int col = index.column();
         switch (col)
         {
@@ -228,7 +238,10 @@ bool AppTableModel::setData(const QModelIndex &index, const QVariant &value, int
             app.appIcon = value.value<QIcon>();
             break;
         case 1:
-            app.appName = value.toString();
+            if (app.appName.isEmpty())
+                app.appName = settings.value("apps/" + app.packageName + "/appName").toString();
+            else
+                app.appName = value.toString();
             break;
         case 2:
             app.appVersion = value.toString();

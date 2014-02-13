@@ -1080,7 +1080,6 @@ void ThreadBackups::run()
     }
     else
        onsdcard = true;
-
     if (onsdcard == false)
     {
         proces->start("findstr /S -M app.name= \"" + backuponpc + "*\"");
@@ -1089,12 +1088,23 @@ void ThreadBackups::run()
     }
     else
     {
-    proces->start("\"" + this->sdk + "\"adb shell busybox find \"" + codec->toUnicode(appsBackupFolder.toUtf8()) + "\" -name *.txt");
-    proces->waitForFinished(-1);
-    output = proces->readAll();
+        proces->start("\"" + this->sdk + "\"adb shell su -c 'busybox find \"" + codec->toUnicode(appsBackupFolder.toUtf8()) + "\" -name *.txt'");
+        proces->waitForFinished(-1);
+        output = proces->readAll();
+        if (output.contains("su: not found"))
+        {
+            proces->start("\"" + this->sdk + "\"adb shell busybox find \"" + codec->toUnicode(appsBackupFolder.toUtf8()) + "\" -name *.txt");
+            proces->waitForFinished(-1);
+            output = proces->readAll();
+        }
     }
     outputLines = output.split("\n", QString::SkipEmptyParts);
+    qDebug()<<"on SDCARD = "<<onsdcard;
+    qDebug()<<"Backup Folder = "<<codec->toUnicode(appsBackupFolder.toUtf8());
+    qDebug()<<"Command = "<<"\"" + this->sdk + "\"adb shell su -c 'busybox find \"" + codec->toUnicode(appsBackupFolder.toUtf8()) + "\" -name *.txt'";
+    qDebug()<<"find output = "<<output;
     qDebug()<<"Backup outputList = "<<outputLines;
+    qDebug()<<"Backup outputList Size = "<<outputLines.size();
     emit this->maximum(outputLines.size());
     int max = outputLines.size();
     i = 0;
@@ -1135,9 +1145,15 @@ void ThreadBackups::run()
         }
         else
         {
-            proces->start("\"" + this->sdk + "\"adb shell busybox cat \"" + codec->toUnicode(appsBackupFolder.toUtf8()) + codec->toUnicode(namedir.toUtf8())+ codec->toUnicode(backupFound.packageName.toUtf8())+".txt\"");
+            proces->start("\"" + this->sdk + "\"adb shell su -c 'busybox cat \"" + codec->toUnicode(appsBackupFolder.toUtf8()) + codec->toUnicode(namedir.toUtf8())+ codec->toUnicode(backupFound.packageName.toUtf8())+".txt\"'");
             proces->waitForFinished(-1);
             output = proces->readAll();
+            if (output.contains("su: not found"))
+            {
+                proces->start("\"" + this->sdk + "\"adb shell busybox cat \"" + codec->toUnicode(appsBackupFolder.toUtf8()) + codec->toUnicode(namedir.toUtf8())+ codec->toUnicode(backupFound.packageName.toUtf8())+".txt\"");
+                proces->waitForFinished(-1);
+                output = proces->readAll();
+            }
             txtLines = output.split("\n", QString::SkipEmptyParts);
             if (output.contains("No such file or directory"))
                 break;
@@ -1193,9 +1209,15 @@ void ThreadBackups::run()
         }
         else
         {
-            proces->start("\"" + this->sdk + "\"adb shell busybox ls \"" + codec->toUnicode(appsBackupFolder.toUtf8()) + codec->toUnicode(namedir.toUtf8())+ codec->toUnicode(backupFound.packageName.toUtf8())+".apk\"");
+            proces->start("\"" + this->sdk + "\"adb shell su -c 'busybox ls \"" + codec->toUnicode(appsBackupFolder.toUtf8()) + codec->toUnicode(namedir.toUtf8())+ codec->toUnicode(backupFound.packageName.toUtf8())+".apk\"'");
             proces->waitForFinished(-1);
             output = proces->readAll();
+            if (output.contains("su: not found"))
+            {
+                proces->start("\"" + this->sdk + "\"adb shell busybox ls \"" + codec->toUnicode(appsBackupFolder.toUtf8()) + codec->toUnicode(namedir.toUtf8())+ codec->toUnicode(backupFound.packageName.toUtf8())+".apk\"");
+                proces->waitForFinished(-1);
+                output = proces->readAll();
+            }
             if (output.contains("No such file or directory"))
                 backupFound.withApk = false;
             else
@@ -1210,9 +1232,15 @@ void ThreadBackups::run()
         }
         else
         {
-            proces->start("\"" + this->sdk + "\"adb shell busybox ls \"" + codec->toUnicode(appsBackupFolder.toUtf8()) + codec->toUnicode(namedir.toUtf8())+ codec->toUnicode(backupFound.packageName.toUtf8())+".DATA.tar.gz\"");
+            proces->start("\"" + this->sdk + "\"adb shell su -c 'busybox ls \"" + codec->toUnicode(appsBackupFolder.toUtf8()) + codec->toUnicode(namedir.toUtf8())+ codec->toUnicode(backupFound.packageName.toUtf8())+".DATA.tar.gz\"'");
             proces->waitForFinished(-1);
             output = proces->readAll();
+            if (output.contains("su: not found"))
+            {
+                proces->start("\"" + this->sdk + "\"adb shell busybox ls \"" + codec->toUnicode(appsBackupFolder.toUtf8()) + codec->toUnicode(namedir.toUtf8())+ codec->toUnicode(backupFound.packageName.toUtf8())+".DATA.tar.gz\"");
+                proces->waitForFinished(-1);
+                output = proces->readAll();
+            }
             if (output.contains("No such file or directory"))
                 backupFound.withData = false;
             else
@@ -1244,9 +1272,15 @@ void ThreadApps::run()
     delete aapt;
     if (this->systemApps)
     {
-        proces.start("\"" + this->sdk + "\"adb shell busybox ls -l /system/app/*.apk");
+        proces.start("\"" + this->sdk + "\"adb shell su -c 'busybox ls -l /system/app/*.apk'");
         proces.waitForFinished(-1);
         output = proces.readAll();
+        if (output.contains("su: not found"))
+        {
+            proces.start("\"" + this->sdk + "\"adb shell busybox ls -l /system/app/*.apk");
+            proces.waitForFinished(-1);
+            output = proces.readAll();
+        }
         qDebug()<<"Get apps system - "<<output;
         lines = output.split("\n", QString::SkipEmptyParts);
         while (lines.size() > 0)
@@ -1275,9 +1309,15 @@ void ThreadApps::run()
     }
     else
     {
-        proces.start("\"" + this->sdk + "\"adb shell busybox ls -l /data/app/*.apk");
+        proces.start("\"" + this->sdk + "\"adb shell su -c 'busybox ls -l /data/app/*.apk'");
         proces.waitForFinished(-1);
         output = proces.readAll();
+        if (output.contains("su: not found"))
+        {
+            proces.start("\"" + this->sdk + "\"adb shell busybox ls -l /data/app/*.apk");
+            proces.waitForFinished(-1);
+            output = proces.readAll();
+        }
         qDebug()<<"Get apps data - "<<output;
         lines = output.split("\n", QString::SkipEmptyParts);
         while (lines.size() > 0)
@@ -1303,9 +1343,15 @@ void ThreadApps::run()
                 appList.append(app);
             }
         }
-        proces.start("\"" + this->sdk + "\"adb shell busybox ls -l /data/app-private/*.apk");
+        proces.start("\"" + this->sdk + "\"adb shell su -c 'busybox ls -l /data/app-private/*.apk'");
         proces.waitForFinished(-1);
         output = proces.readAll();
+        if (output.contains("su: not found"))
+        {
+            proces.start("\"" + this->sdk + "\"adb shell busybox ls -l /data/app-private/*.apk");
+            proces.waitForFinished(-1);
+            output = proces.readAll();
+        }
         qDebug()<<"Get apps data - "<<output;
         lines = output.split("\n", QString::SkipEmptyParts);
         while (lines.size() > 0)
@@ -1331,9 +1377,15 @@ void ThreadApps::run()
                 appList.append(app);
             }
         }
-        proces.start("\"" + this->sdk + "\"adb shell busybox ls -l /mnt/asec/*/*.apk");
+        proces.start("\"" + this->sdk + "\"adb shell su -c 'busybox ls -l /mnt/asec/*/*.apk'");
         proces.waitForFinished(-1);
         output = proces.readAll();
+        if (output.contains("su: not found"))
+        {
+            proces.start("\"" + this->sdk + "\"adb shell busybox ls -l /mnt/asec/*/*.apk");
+            proces.waitForFinished(-1);
+            output = proces.readAll();
+        }
         qDebug()<<"Get apps sd - "<<output;
         lines = output.split("\n", QString::SkipEmptyParts);
         while (lines.size() > 0)
@@ -1351,7 +1403,7 @@ void ThreadApps::run()
                 app.appFile = "/mnt/asec/" + tmp;
                 tmp.replace("/","-");
                 app.appFileName = tmp;
-                app.location = "sdcard";
+                app.location = "/mnt/asec/";
                 app.packageName = settings.value("apps/" + app.appFileName, "").toString();
 
                 tmp = split.at(5) + split.at(6) + split.at(7);
@@ -1381,12 +1433,24 @@ void ThreadApps::run()
         {
             if (!sdFolder.endsWith("/",Qt::CaseInsensitive))
                 sdFolder.append("/");
-            proces.start("\"" + this->sdk + "\"adb shell busybox ls -l "+ codec->toUnicode(sdFolder.toUtf8()) + "/*/*.apk");
+            proces.start("\"" + this->sdk + "\"adb shell su -c 'busybox ls -l "+ codec->toUnicode(sdFolder.toUtf8()) + "/*/*.apk'");
             proces.waitForFinished(-1);
             output=proces.readAll();
-            proces.start("\"" + this->sdk + "\"adb shell busybox ls -l "+ codec->toUnicode(sdFolder.toUtf8()) + "/*.apk");
+            if (output.contains("su: not found"))
+            {
+                proces.start("\"" + this->sdk + "\"adb shell busybox ls -l "+ codec->toUnicode(sdFolder.toUtf8()) + "/*/*.apk");
+                proces.waitForFinished(-1);
+                output=proces.readAll();
+            }
+            proces.start("\"" + this->sdk + "\"adb shell su -c 'busybox ls -l "+ codec->toUnicode(sdFolder.toUtf8()) + "/*.apk'");
             proces.waitForFinished(-1);
             output.append(proces.readAll());
+            if (output.contains("su: not found"))
+            {
+                proces.start("\"" + this->sdk + "\"adb shell busybox ls -l "+ codec->toUnicode(sdFolder.toUtf8()) + "/*.apk");
+                proces.waitForFinished(-1);
+                output.append(proces.readAll());
+            }
             qDebug()<<"Get apps sd - "<<output;
             lines = output.split("\n", QString::SkipEmptyParts);
             while (lines.size() > 0)
@@ -1445,12 +1509,13 @@ void ThreadApps::run()
         if ((!settingsList.contains(app.appFileName)) ||
             (settings.value("apps/" + app.packageName + "/date", "").toString() != app.date))
         {
+            qDebug()<<"settings->appDate="<<settings.value("apps/" + app.packageName + "/date", "").toString()<<"   current appDate ="<<app.date;
             qDebug()<<"Apps needs to pull apk ="<<app.appFileName;
             zip.start("\""+sdk+"\""+"adb pull "+app.appFile.toLatin1()+" \""+QDir::currentPath()+"/tmp/\""+app.appFileName);
             zip.waitForFinished(-1);
             temp = zip.readAll();
             qDebug()<<"Apps copy - "<<temp;
-            if (temp.contains("does not exist") || temp.contains("Android Debug Bridge"))
+            if (temp.contains("does not exist") || temp.contains("Android Debug Bridge") || temp.contains("Permission denied"))
                 continue;
             zip.start("\""+sdk+"\"aapt d badging \""+QDir::currentPath()+"/tmp/\""+app.appFileName);
             zip.waitForReadyRead(-1);
@@ -1477,11 +1542,18 @@ void ThreadApps::run()
                         app.appVersion.remove("versionName='");
                         app.appVersion.remove("'");
                     }
-                    else if (aaptLineParts.first().contains(QRegExp("label="))&&app.appName.isEmpty())
+                    else if (aaptLineParts.first().contains(QRegExp("label=")) && app.appName.isEmpty())
                     {
+                        qDebug()<<"111111app.appName ="<<app.appName;
                         app.appName=QString::fromUtf8(aaptLineParts.first().toAscii());
                         app.appName.remove(0,app.appName.indexOf("label=")+6);
                         app.appName.remove("'");
+                      //  app.appName.remove(QRegExp(QString::fromUtf8("[-`~!@#$%^&*()_—+=|:;<>«»,.?/{}\'\"\\\[\\\]\\\\]")));
+                        app.appName.remove(QChar(0x2122));
+                        app.appName.remove(QChar(0x00AE));
+                        app.appName.remove(QChar(0x00A9));
+                        while(app.appName.endsWith( ' ' )) app.appName.chop(1);
+                        qDebug()<<"222222app.appName ="<<app.appName;
                     }
                     else if (aaptLineParts.first().contains(QRegExp("^icon="))&&app.icoName.isEmpty())
                     {
@@ -1489,6 +1561,10 @@ void ThreadApps::run()
                         app.icoName.remove("icon='");
                         app.icoName.remove("'");
                     }
+//                    if (app.appName.isEmpty())
+//                        app.appName = app.appFileName.remove(".apk");
+//                    if (app.icoName.isEmpty())
+//                        app.icoName = QDir::currentPath()+"/tools/android.png";
                     aaptLineParts.removeFirst();
                 }
                 aaptLines.removeFirst();
@@ -1500,6 +1576,8 @@ void ThreadApps::run()
             settings.setValue("apps/"+app.packageName+"/version", app.appVersion);
             settings.setValue("apps/"+app.packageName+"/size", app.appSize);
             settings.setValue("apps/"+app.packageName+"/date", app.date);
+            if (settings.value("apps/" + app.packageName + "/appName").toString().isEmpty())
+                settings.setValue("apps/"+app.packageName+"/appName", app.appFileName.remove(".apk"));
         }
         else
         {
@@ -1526,9 +1604,9 @@ void ThreadApps::run()
         fileInfoList=dir.entryInfoList();
         while (fileInfoList.length()>0)
             fileTmpList.append(fileInfoList.takeFirst().fileName());
-        if (!settings.contains("apps/"+app.packageName+"/icon"))
+        if (!settings.contains("apps/"+app.packageName+"/icon") || settings.value("apps/" + app.packageName + "/icon").toString().isEmpty())
         {
-            qDebug()<<"Apps there is missing icon i settings";
+            qDebug()<<"Apps there is missing icon settings";
             if (!fileTmpList.contains(app.appFileName))
             {
                 zip.start("\""+sdk+"\""+"adb pull "+app.appFile.toLatin1()+" \""+QDir::currentPath()+"/tmp/\""+app.appFileName);
@@ -1540,10 +1618,20 @@ void ThreadApps::run()
 
             QByteArray ba;
             QFile icon(QDir::currentPath()+"/tmp/"+temp);
-            icon.open(QIODevice::ReadWrite);
-            ba = icon.readAll();
-            settings.setValue("apps/"+app.packageName+"/icon", ba); //- zapisanie pixmap w QSettings
-            icon.remove();
+            if (!icon.exists())
+            {
+                QFile png(QDir::currentPath()+"/tools/android.png");
+                png.open(QIODevice::ReadWrite);
+                ba = png.readAll();
+                settings.setValue("apps/"+app.packageName+"/icon", ba); //- zapisanie pixmap w QSettings
+            }
+            else
+            {
+                icon.open(QIODevice::ReadWrite);
+                ba = icon.readAll();
+                settings.setValue("apps/"+app.packageName+"/icon", ba); //- zapisanie pixmap w QSettings
+                icon.remove();
+            }
          //   QDir dir;
           //  dir.rmdir (QDir::currentPath()+"/icons");
             qDebug()<<"Apps got icon now";
@@ -1854,15 +1942,28 @@ void AppWidget::openMarket()
     QSettings settings;
     sdk = settings.value("sdkPath").toString();
     QProcess proc;
-    proc.start("\"" + sdk + "\"adb shell am start -a android.intent.action.VIEW -d market://details?id="
-               + this->ui->editAppsPackageName->text() + " -n com.android.vending/.AssetBrowserActivity");
+    proc.start("\"" + sdk + "\"adb shell su -c 'am start -a android.intent.action.VIEW -d market://details?id="
+               + this->ui->editAppsPackageName->text() + " -n com.android.vending/.AssetBrowserActivity'");
     proc.waitForFinished(-1);
     QString out = proc.readAll();
-    if (out.contains("Error"))
+    if (out.contains("su: not found"))
     {
         proc.start("\"" + sdk + "\"adb shell am start -a android.intent.action.VIEW -d market://details?id="
-                   + this->ui->editAppsPackageName->text() + " -n com.android.vending/com.google.android.finsky.activities.PlayLauncherActivity");
+                   + this->ui->editAppsPackageName->text() + " -n com.android.vending/.AssetBrowserActivity");
         proc.waitForFinished(-1);
+    }
+    if (out.contains("Error"))
+    {
+        proc.start("\"" + sdk + "\"adb shell su -c 'am start -a android.intent.action.VIEW -d market://details?id="
+                   + this->ui->editAppsPackageName->text() + " -n com.android.vending/com.google.android.finsky.activities.PlayLauncherActivity'");
+        proc.waitForFinished(-1);
+        out = proc.readAll();
+        if (out.contains("su: not found"))
+        {
+            proc.start("\"" + sdk + "\"adb shell am start -a android.intent.action.VIEW -d market://details?id="
+                       + this->ui->editAppsPackageName->text() + " -n com.android.vending/com.google.android.finsky.activities.PlayLauncherActivity");
+            proc.waitForFinished(-1);
+        }
     }
     qDebug()<<"adb shell am start -a android.intent.action.VIEW -d market://details?id=" << this->ui->editAppsPackageName->text() << " -n com.android.vending/.AssetBrowserActivity";
 }

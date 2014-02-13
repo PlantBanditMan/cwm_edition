@@ -83,10 +83,17 @@ appInfo::appInfo(QWidget *parent, App *app) :
     QSettings settings;
     sdk = settings.value("sdkPath").toString();
     QProcess proc;
-    proc.start("\"" + sdk + "\"adb shell busybox ls /data/app/"
-               + this->app->packageName + "*");
+    proc.start("\"" + sdk + "\"adb shell su -c 'busybox ls /data/app/"
+               + this->app->packageName + "*'");
     proc.waitForFinished(-1);
     QString output = proc.readAll();
+    if (output.contains("su: not found"))
+    {
+        proc.start("\"" + sdk + "\"adb shell busybox ls /data/app/"
+                   + this->app->packageName + "*");
+        proc.waitForFinished(-1);
+        output = proc.readAll();
+    }
     if (!output.contains("No such file or directory"))
     {
         this->ui->pushButton->setText(tr("Reinstall"));
@@ -159,10 +166,17 @@ appInfo::appInfo(App *app) :
     QSettings settings;
     sdk = settings.value("sdkPath").toString();
     QProcess proc;
-    proc.start("\"" + sdk + "\"adb shell busybox ls /data/app/"
-               + this->app->packageName + "*");
+    proc.start("\"" + sdk + "\"adb shell su -c 'busybox ls /data/app/"
+               + this->app->packageName + "*'");
     proc.waitForFinished(-1);
     QString output = proc.readAll();
+    if (output.contains("su: not found"))
+    {
+        proc.start("\"" + sdk + "\"adb shell busybox ls /data/app/"
+                   + this->app->packageName + "*");
+        proc.waitForFinished(-1);
+        output = proc.readAll();
+    }
     if (!output.contains("No such file or directory"))
     {
         this->ui->pushButton->setText(tr("Reinstall"));
@@ -224,15 +238,28 @@ void appInfo::openMarket()
     QSettings settings;
     sdk = settings.value("sdkPath").toString();
     QProcess proc;
-    proc.start("\"" + sdk + "\"adb shell am start -a android.intent.action.VIEW -d market://details?id="
-               + this->ui->editAppsPackageName->text() + " -n com.android.vending/.AssetBrowserActivity");
+    proc.start("\"" + sdk + "\"adb shell su -c 'am start -a android.intent.action.VIEW -d market://details?id="
+               + this->ui->editAppsPackageName->text() + " -n com.android.vending/.AssetBrowserActivity'");
     proc.waitForFinished(-1);
     QString out = proc.readAll();
-    if (out.contains("Error"))
+    if (out.contains("su: not found"))
     {
         proc.start("\"" + sdk + "\"adb shell am start -a android.intent.action.VIEW -d market://details?id="
-                   + this->ui->editAppsPackageName->text() + " -n com.android.vending/com.google.android.finsky.activities.PlayLauncherActivity");
+                   + this->ui->editAppsPackageName->text() + " -n com.android.vending/.AssetBrowserActivity");
         proc.waitForFinished(-1);
+        out = proc.readAll();
+    }
+    if (out.contains("Error"))
+    {
+        proc.start("\"" + sdk + "\"adb shell su -c 'am start -a android.intent.action.VIEW -d market://details?id="
+                   + this->ui->editAppsPackageName->text() + " -n com.android.vending/com.google.android.finsky.activities.PlayLauncherActivity'");
+        proc.waitForFinished(-1);
+        if (proc.readAll().contains("su: not found"))
+        {
+            proc.start("\"" + sdk + "\"adb shell am start -a android.intent.action.VIEW -d market://details?id="
+                       + this->ui->editAppsPackageName->text() + " -n com.android.vending/com.google.android.finsky.activities.PlayLauncherActivity");
+            proc.waitForFinished(-1);
+        }
     }
     qDebug()<<"adb shell am start -a android.intent.action.VIEW -d market://details?id="<<this->app->packageName<<" -n com.android.vending/.AssetBrowserActivity";
 }

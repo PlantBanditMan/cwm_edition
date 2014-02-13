@@ -31,6 +31,10 @@
   <property name="windowTitle">
    <string>Register</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="../zasoby.qrc">
+    <normaloff>:/icons/save.png</normaloff>:/icons/save.png</iconset>
+  </property>
   <property name="modal">
    <bool>true</bool>
   </property>
@@ -199,6 +203,8 @@ p, li { white-space: pre-wrap; }
  <tabstops>
   <tabstop>lineEdit</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="../zasoby.qrc"/>
+ </resources>
  <connections/>
 </ui>

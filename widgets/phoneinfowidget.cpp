@@ -88,15 +88,27 @@ void PhoneInfoWidget::showPhoneInfo()
 {
         QString data,tmp="1";
         QStringList list;
+        int device;
         QProcess *proces=new QProcess;
-        proces->start("\""+sdk+"\""+"adb shell getprop");
+        QProcess su;
+        su.start("\""+sdk+"\""+"adb shell su");
+        su.waitForReadyRead();
+        if (su.readAll().contains("su: not found"))
+        {
+            proces->start("\""+sdk+"\""+"adb shell getprop");
+            device = 0;
+        }
+        else
+        {
+            proces->start("\""+sdk+"\""+"adb shell su -c 'getprop'");
+            device = 1;
+        }
         while (!tmp.isEmpty())
         {
             proces->waitForReadyRead(-1);
             tmp=proces->readLine();
             list.append(tmp);
         }
-
         for (int i=0;i<list.length();i++)
         {
             qDebug()<<"Getprop - "<<list.at(i);
@@ -114,6 +126,16 @@ void PhoneInfoWidget::showPhoneInfo()
                 tmp.remove("[ro.baseband]: ");
                 tmp.remove("[");
                 tmp.remove("]");
+                if (tmp.contains("unknown"))
+                {
+                    if (device == 1)
+                        proces->start("\""+sdk+"\""+"adb shell su -c 'cat /sys/devices/system/soc/soc0/build_id'");
+                    else
+                        proces->start("\""+sdk+"\""+"adb shell cat /sys/devices/system/soc/soc0/build_id");
+                    proces->waitForReadyRead(-1);
+                    tmp=proces->readAll();
+                    tmp.trimmed();
+                }
                 ui->lineEditRadio->setText(tmp);
             }
             else if (list.at(i).contains("[ro.bootloader]"))
@@ -138,14 +160,21 @@ void PhoneInfoWidget::showPhoneInfo()
                 tmp.remove("[gsm.operator.alpha]: ");
                 tmp.remove("[");
                 tmp.remove("]");
-                ui->lineEditOperator->setText(tmp);
+                if (!tmp.isEmpty())
+                    ui->lineEditOperator->setText(tmp);
+                else
+                    ui->lineEditOperator->setText("Uknown");
             }
         }
+        proces->close();
 //        ui->lineEditSerialNumber->setText(this->phone->serialNumber);
 
 
-
-        proces->start("\""+sdk+"\""+"adb shell busybox cat /sys/class/power_supply/battery/capacity");
+      //  QProcess procesb;
+        if (device == 1)
+            proces->start("\""+sdk+"\""+"adb shell su -c 'busybox cat /sys/class/power_supply/battery/capacity'");
+        else
+              proces->start("\""+sdk+"\""+"adb shell busybox cat /sys/class/power_supply/battery/capacity");
         proces->waitForReadyRead(-1);
         tmp=proces->readLine();
         ui->progressBarBatteryLevel->setValue(tmp.toInt());
@@ -183,7 +212,10 @@ void PhoneInfoWidget::showPhoneInfo()
             if (sdFolder.endsWith("/",Qt::CaseInsensitive))
                 sdFolder.chop(1);
         }
-        proces->start("\""+sdk+"\""+"adb shell busybox df");
+        if (device == 1)
+            proces->start("\""+sdk+"\""+"adb shell su -c 'busybox df'");
+        else
+             proces->start("\""+sdk+"\""+"adb shell busybox df");
         tmp.clear();
 
         while (true)
@@ -204,6 +236,17 @@ void PhoneInfoWidget::showPhoneInfo()
             ui->lineEditExtAvailable->setDisabled(true);
             ui->lineEditExtSize->setDisabled(true);
             ui->lineEditExtUsed->setDisabled(true);
+        }
+        else
+        {
+            ui->progressBarExt->setDisabled(false);
+            ui->labelExtAvailable->setDisabled(false);
+            ui->labelExt->setDisabled(false);
+            ui->labelExtSize->setDisabled(false);
+            ui->labelExtUsed->setDisabled(false);
+            ui->lineEditExtAvailable->setDisabled(false);
+            ui->lineEditExtSize->setDisabled(false);
+            ui->lineEditExtUsed->setDisabled(false);
         }
         list=tmp.split("\n");
         QStringList parts;
@@ -246,8 +289,10 @@ void PhoneInfoWidget::showPhoneInfo()
                 ui->progressBarExt->setMaximum(used.toUInt()+available.toUInt());
                 ui->progressBarExt->setValue(used.toUInt());
             }
-            else if (tmp.contains("/sdcard"))
+            else if (tmp.contains("/sdcard") || tmp.contains("/emulated"))
             {
+                if (tmp.contains("/emulated") && !tmp.contains("/sdcard"))
+                    ui->label_17->setText("/sdcard (emulated)");
                 ui->lineEditSdcardAvailable->setText(PhoneInfoWidget::humanReadableSize(available+"000"));
                 ui->lineEditSdcardUsed->setText(PhoneInfoWidget::humanReadableSize(used+"000"));
                 ui->lineEditSdcardSize->setText(PhoneInfoWidget::humanReadableSize(QString::number(used.toUInt()+available.toUInt())+"000"));
@@ -257,6 +302,7 @@ void PhoneInfoWidget::showPhoneInfo()
         }
 //        int i=0;
         //df
+        proces->close();
 }
 
 void PhoneInfoWidget::on_pushButton_clicked()

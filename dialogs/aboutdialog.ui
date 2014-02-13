@@ -22,6 +22,10 @@
   <property name="windowTitle">
    <string extracomment="About dialog title">QtADB - Your android manager</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="../zasoby.qrc">
+    <normaloff>:/icons/info.png</normaloff>:/icons/info.png</iconset>
+  </property>
   <property name="windowOpacity">
    <double>1.000000000000000</double>
   </property>

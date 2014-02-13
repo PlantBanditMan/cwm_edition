@@ -70,15 +70,15 @@ void ScreenshotWidget::resizeEvent(QResizeEvent * event)
 
 void ScreenshotWidget::mousePressEvent(QMouseEvent *event)
 {
-    if (event->button() == Qt::LeftButton)
-    {
-        this->rotation = 0;
-        QSize scaledSize = QSize(this->widthScreen, this->heightScreen);
-        scaledSize.scale(this->ui->labelRgb565->size(), Qt::KeepAspectRatio);
-        QPixmap pix = QPixmap::fromImage(noScreenshotImage(scaledSize.width(), scaledSize.height()), Qt::AutoColor);
-        this->ui->labelRgb565->setPixmap(pix);
-        this->takeScreenshot();
-    }
+//    if (event->button() == Qt::LeftButton)
+//    {
+//        this->rotation = 0;
+//        QSize scaledSize = QSize(this->widthScreen, this->heightScreen);
+//        scaledSize.scale(this->ui->labelRgb565->size(), Qt::KeepAspectRatio);
+//        QPixmap pix = QPixmap::fromImage(noScreenshotImage(scaledSize.width(), scaledSize.height()), Qt::AutoColor);
+//        this->ui->labelRgb565->setPixmap(pix);
+//        this->takeScreenshot();
+//    }
 }
 
 void ScreenshotWidget::refreshScreenshot()
@@ -90,6 +90,7 @@ void ScreenshotWidget::refreshScreenshot()
     QPixmap pix = QPixmap::fromImage(noScreenshotImage(scaledSize.width(), scaledSize.height()), Qt::AutoColor);
     this->ui->labelRgb565->setPixmap(pix);
     takeScreenshot();
+    qDebug("refresh");
 }
 
 void ScreenshotWidget::rotateLeft()
@@ -144,11 +145,14 @@ void ScreenshotWidget::showScreenshot(QImage image, int width, int height)
 {
     this->rotation = 0;
     QSize scaledSize = QSize(width, height);
+    qDebug()<<"size="<<scaledSize;
     scaledSize.scale(this->size(), Qt::KeepAspectRatio);
+    qDebug()<<"scaledSize.scale="<<scaledSize;
     this->screenshot = QPixmap::fromImage(image, Qt::AutoColor);
     this->ui->labelRgb565->setPixmap(this->screenshot.scaled(this->ui->labelRgb565->size(),
                                                              Qt::KeepAspectRatio,
                                                              Qt::SmoothTransformation));
+    threadScreenshot.terminate();
     disconnect(this, SLOT(showScreenshot(QImage,int,int)));
 }
 
@@ -158,6 +162,7 @@ void ScreenshotWidget::takeScreenshot()
     threadScreenshot.heightScreen = this->ui->labelRgb565->height();
     threadScreenshot.start();
     connect(&threadScreenshot, SIGNAL(gotScreenshot(QImage, int, int)), this, SLOT(showScreenshot(QImage, int, int)));
+    qDebug("takeScreenshot");
 }
 
 void ScreenshotWidget::updateScreenshotLabel()

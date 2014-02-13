@@ -99,10 +99,10 @@ void FastbootWidget::on_buttonFlashSPL_pressed()
         QProcess *process=new QProcess();
         process->setProcessChannelMode(QProcess::MergedChannels);
         QString tmp;
-        QString imgFileName = QFileDialog::getOpenFileName(this, tr("Choose hboot img file..."), ".", tr("IMG File ")+"(*.img)");
+        QString imgFileName = QFileDialog::getOpenFileName(this, tr("Choose boot img file..."), ".", tr("IMG File ")+"(*.img)");
         if (!imgFileName.isEmpty())
         {
-            process->start("\"" + sdk + "\"fastboot flash hboot \"" + imgFileName + "\"");
+            process->start("\"" + sdk + "\"fastboot flash boot \"" + imgFileName + "\"");
             process->waitForFinished(-1);
             tmp = process->readAll();
             if (tmp.contains("error"))

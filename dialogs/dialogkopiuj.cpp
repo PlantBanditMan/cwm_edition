@@ -328,19 +328,34 @@ void ThreadCopy::run()
             emit this->nextFile(file.fileName, sourceDir, targetDir, fileSize, counter);
             if (fileName.contains("/"))
             {
-                proces->start("\""+sdk+"\""+"adb shell busybox mkdir \""+ codec->toUnicode(this->targetPath.toUtf8())
-                             +codec->toUnicode(fileName.left(fileName.lastIndexOf("/")).toUtf8())+"\"");
+                proces->start("\""+sdk+"\""+"adb shell su -c 'busybox mkdir \""+ codec->toUnicode(this->targetPath.toUtf8())
+                             +codec->toUnicode(fileName.left(fileName.lastIndexOf("/")).toUtf8())+"\"'");
                 proces->waitForFinished(-1);
                 output = proces->readAll();
+                if (output.contains("su: not found"))
+                {
+                    proces->start("\""+sdk+"\""+"adb shell busybox mkdir \""+ codec->toUnicode(this->targetPath.toUtf8())
+                                 +codec->toUnicode(fileName.left(fileName.lastIndexOf("/")).toUtf8())+"\"");
+                    proces->waitForFinished(-1);
+                    output = proces->readAll();
+                }
                 qDebug()<<"Copy - "<<output;
             }
             dialogKopiuj::fileRemove(this->targetPath+fileName, this->mode);
-            command = "\""+sdk+"\""+"adb shell busybox cp \""+codec->toUnicode(file.filePath.toUtf8())+"\" \""+
-                               codec->toUnicode(this->targetPath.toUtf8())+codec->toUnicode(fileName.toUtf8())+"\"";
-            qDebug()<<"Copy - "<<command;
+            command = "\""+sdk+"\""+"adb shell su -c 'busybox cp \""+codec->toUnicode(file.filePath.toUtf8())+"\" \""+
+                               codec->toUnicode(this->targetPath.toUtf8())+codec->toUnicode(fileName.toUtf8())+"\"'";
             proces->start(command);
             proces->waitForFinished(-1);
             output = proces->readAll();
+            if (output.contains("su: not found"))
+            {
+                command = "\""+sdk+"\""+"adb shell busybox cp \""+codec->toUnicode(file.filePath.toUtf8())+"\" \""+
+                                   codec->toUnicode(this->targetPath.toUtf8())+codec->toUnicode(fileName.toUtf8())+"\"";
+                proces->start(command);
+                proces->waitForFinished(-1);
+                output = proces->readAll();
+            }
+            qDebug()<<"Copy - "<<command;
             qDebug()<<"Copy - "<<output;
             delete proces;
         }
@@ -387,9 +402,9 @@ void ThreadCopy::run()
 void ThreadProgress::run()
 {
     qDebug()<<"Copy, ThreadProgress.run() - START";
-    QString command, output;
+ //   QString command, output;
     int fileSize = 0;
-    QStringList outputParts;
+   // QStringList outputParts;
     QProcess *proces = new QProcess;
     QFile plik;
     proces->setProcessChannelMode(QProcess::MergedChannels);
@@ -472,8 +487,14 @@ void dialogKopiuj::fileRemove(QString filePath, int mode)
         QSettings settings;
         QProcess *proces = new QProcess;
         QString sdk = settings.value("sdkPath").toString();
-        QString command = "\""+sdk+"\""+"adb shell busybox rm -f \""+codec->toUnicode(filePath.toUtf8())+"\"";
+        QString command = "\""+sdk+"\""+"adb shell su -c 'busybox rm -f \""+codec->toUnicode(filePath.toUtf8())+"\"'";
         proces->start(command);
         proces->waitForFinished(-1);
+        if (proces->readAll().contains("su: not found"))
+        {
+            command = "\""+sdk+"\""+"adb shell busybox rm -f \""+codec->toUnicode(filePath.toUtf8())+"\"";
+            proces->start(command);
+            proces->waitForFinished(-1);
+        }
     }
 }

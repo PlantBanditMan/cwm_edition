@@ -19,6 +19,7 @@
 
 
 #include "./threads/screenshotthread.h"
+#include <QtDebug>
 
 QImage noScreenshotImage(int width, int height)
 {
@@ -98,8 +99,7 @@ void ThreadScreenshot::run()
     bool ok,recovery=false;
     unsigned int width=0, height=0, redSize=0, greenSize=0, blueSize=0, alfaSize=0;
     unsigned int redOffset=0, greenOffset=0, blueOffset=0, alfaOffset=0;
-    unsigned int bytesPerPixel=0, dataSize=0;
-
+    unsigned int bytesPerPixel=0;
     this->socket = new QTcpSocket();
     this->socket->connectToHost("127.0.0.1",5037,QTcpSocket::ReadWrite);
     if (this->socket->waitForConnected(2000))
@@ -107,6 +107,7 @@ void ThreadScreenshot::run()
         this->socket->write("0012host:track-devices");
         this->socket->waitForReadyRead(2000);
         data = this->socket->read(4);
+        qDebug()<<"1 screenshot data ="<<data;
         if (data == "OKAY")
         {
             this->socket->waitForReadyRead(2000);
@@ -117,11 +118,13 @@ void ThreadScreenshot::run()
             {
                 serialLength = tmp.toInt(&ok, 16) - 8;
                 recovery = false;
+                qDebug()<<"device screenshot data ="<<data;
             }
             if (data.contains("recovery"))
             {
                 serialLength = tmp.toInt(&ok, 16) - 10;
                 recovery = true;
+                qDebug()<<"recovery screenshot data ="<<data;
             }
             serialNumber = data.left(serialLength);
         }
@@ -154,19 +157,27 @@ void ThreadScreenshot::run()
                     data = this->socket->read(52);
                     if (recovery)
                     {
-                        dataSize = bytes_to_int(data,4);
-                        width = bytes_to_int(data, 8);
-                        height = bytes_to_int(data, 12);
-                        bytesPerPixel = dataSize/width/height;
-                        redOffset = 11;
-                        redSize = 5;
-                        blueOffset = 0;
-                        blueSize = 5;
-                        greenOffset = 5;
-                        greenSize = 6;
-                        alfaOffset = 0;
-                        alfaSize = 0;
-                        this->socket->write("00");
+                        qDebug("SCREENSHOT_START.");
+                        buffer = new QProcess;
+                        buffer->start("adb pull /dev/graphics/fb0 \""+QDir::currentPath()+"/tmp/fb0"+ "\"");
+                        buffer->waitForFinished(-1);
+                        convert = new QProcess;
+                        convert->start("\"" + QDir::currentPath()+"/tools/ffmpeg.exe" + "\"" + " -vcodec rawvideo -f rawvideo -pix_fmt rgba -s 768x1280 -i \"" + QDir::currentPath()+"/tmp/fb0" + "\"" + " -vframes 1 -f image2 -vcodec mjpeg \"" + QDir::currentPath()+"/tmp/recovery.jpg" + "\"");
+                        convert->waitForFinished(-1);
+                        image.load(QDir::currentPath()+"/tmp/recovery.jpg");
+                        if (image.isNull())		      // Check if the image was indeed received
+                                qDebug("The image is null. Something failed.");
+                        bytesPerPixel = 1;
+                        width = image.width();
+                        height = image.height();
+                        emit gotScreenshot(image, width, height);
+                        QFile fb(QDir::currentPath()+"/tmp/fb0");
+                        QFile jpg(QDir::currentPath()+"/tmp/recovery.jpg");
+                        if (fb.exists())
+                            fb.remove();
+                        if (jpg.exists())
+                            jpg.remove();
+                        qDebug("SCREENSHOT_FINISH.");
                     }
                     else
                     {
@@ -210,3 +221,4 @@ void ThreadScreenshot::run()
         }///END SCREENSHOT
     }
 }
+

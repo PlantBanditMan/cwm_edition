@@ -33,6 +33,10 @@
   <property name="windowTitle">
    <string extracomment="Main window title">QtADB - Your android manager</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="../zasoby.qrc">
+    <normaloff>:/icons/android.ico</normaloff>:/icons/android.ico</iconset>
+  </property>
   <property name="windowOpacity">
    <double>1.000000000000000</double>
   </property>
@@ -203,8 +207,8 @@
       <string>Adb</string>
      </property>
      <addaction name="actionAdbReboot"/>
-     <addaction name="actionAdbRebootBootloader"/>
      <addaction name="actionAdbRebootRecovery"/>
+     <addaction name="actionAdbRebootBootloader"/>
      <addaction name="actionAdbPowerOff"/>
     </widget>
     <widget class="QMenu" name="menuFastboot">
@@ -266,12 +270,12 @@
   </action>
   <action name="actionAdbRebootBootloader">
    <property name="text">
-    <string>Reboot bootloader</string>
+    <string>Reboot Bootloader</string>
    </property>
   </action>
   <action name="actionAdbRebootRecovery">
    <property name="text">
-    <string>Reboot recovery</string>
+    <string>Reboot Recovery</string>
    </property>
   </action>
   <action name="actionFastbootReboot">
@@ -291,7 +295,7 @@
   </action>
   <action name="actionAdbPowerOff">
    <property name="text">
-    <string>Power off</string>
+    <string>Power Off</string>
    </property>
   </action>
   <action name="actionCheck_for_updates">
@@ -309,6 +313,8 @@
  <tabstops>
   <tabstop>buttonRefresh</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="../zasoby.qrc"/>
+ </resources>
  <connections/>
 </ui>

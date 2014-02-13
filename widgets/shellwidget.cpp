@@ -60,9 +60,15 @@ ShellWidget::ShellWidget(QWidget *parent) :
 
     //qDebug()<<"MainWindow::showPageShell() - process shell is not running, starting...";
     this->sdk=settings.value("sdkPath").toString();
-
     this->process.setProcessChannelMode(QProcess::MergedChannels);
-    this->process.start("\""+sdk+"\""+"adb shell");
+    QProcess su;
+    su.start("\""+sdk+"\""+"adb shell su");
+    su.waitForReadyRead();
+    su.close();
+    if (su.readAll().contains("su: not found"))
+        this->process.start("\""+sdk+"\""+"adb shell");
+    else
+        this->process.start("\""+sdk+"\""+"adb shell su");
 
     connect(&this->process, SIGNAL(readyRead()), this, SLOT(readFromProcess()));
     this->insertPlainText("QtADB shell. Type 'qtadb -help' for instructions\n");
@@ -74,8 +80,16 @@ ShellWidget::~ShellWidget()
 }
 
 void ShellWidget::Refresh(){
-    if (this->process.state() != QProcess::Running){
-         this->process.start("\""+sdk+"\""+"adb shell");
+    if (this->process.state() != QProcess::Running)
+    {
+        QProcess su;
+        su.start("\""+sdk+"\""+"adb shell su");
+        su.waitForReadyRead();
+        su.close();
+        if (su.readAll().contains("su: not found"))
+            this->process.start("\""+sdk+"\""+"adb shell");
+        else
+            this->process.start("\""+sdk+"\""+"adb shell su");
     }
 }
 

@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string extracomment="app info dialog title">App info</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="../zasoby.qrc">
+    <normaloff>:/icons/android.ico</normaloff>:/icons/android.ico</iconset>
+  </property>
   <property name="modal">
    <bool>true</bool>
   </property>

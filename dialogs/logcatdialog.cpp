@@ -65,8 +65,15 @@ LogcatDialog::LogcatDialog(QWidget *parent) :
     this->proces=new QProcess(this);
     proces->setProcessChannelMode(QProcess::MergedChannels);
     this->setWindowTitle("Logcat");
-    this->proces->start("\""+sdk+"\""+"adb logcat");
-
+    QProcess su;
+    su.start("\""+sdk+"\""+"adb shell su");
+    su.waitForReadyRead();
+    QString command;
+    if (su.readAll().contains("su: not found"))
+        command="\""+sdk+"\""+"adb shell logcat";
+    else
+        command="\""+sdk+"\""+"adb shell su -c logcat";
+    this->proces->start(command);
     this->tableView->setModel(this->filterModel);
     this->textBrowser->hide();
     connect(this->proces, SIGNAL(readyRead()), this, SLOT(read()));
@@ -214,7 +221,15 @@ void LogcatDialog::startLogcat()
 {
     if (this->proces->isOpen())
         this->proces->close();
-    this->proces->start("\""+sdk+"\""+"adb logcat");
+    QProcess su;
+    su.start("\""+sdk+"\""+"adb shell su");
+    su.waitForReadyRead();
+    QString command;
+    if (su.readAll().contains("su: not found"))
+        command="\""+sdk+"\""+"adb shell logcat";
+    else
+        command="\""+sdk+"\""+"adb shell su -c logcat";
+    this->proces->start(command);
 }
 
 void LogcatDialog::on_pushButtonClearLogcat_pressed()

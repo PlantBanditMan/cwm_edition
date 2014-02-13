@@ -219,6 +219,34 @@ int main(int argc, char *argv[])
                 settings.setValue("disableProductionBuildsMessage",true);
             }
         }
+        //        QtADB run with limited functionality, ro
+                proces.setProcessChannelMode(QProcess::MergedChannels);
+                proces.start("\"" + sdk + "\"adb shell su -c 'getprop ro.secure'");
+                proces.waitForFinished(-1);
+                tmp = proces.readLine();
+                if (tmp.contains("su: not found"))
+                {
+                    proces.start("\"" + sdk + "\"adb shell getprop ro.secure");
+                    proces.waitForFinished(-1);
+                    tmp = proces.readLine();
+                }
+                if (tmp.contains("1") && !settings.value("disableSecureModeMessage",false).toBool())
+                {
+                    QMessageBox *msgBox2 = new QMessageBox(QMessageBox::Information, QObject::tr("Secure Mode:"),
+                                                           QObject::tr("adbd runs in Secure Mode on this phone.\nYou need to install new kernel with \"ro.secure\" property set to \"0\". Till then QtADB will have very limited functionality.\n\nRun anyway?\n(press save to run QtADB and disable this message.)"),
+                                                           QMessageBox::Yes | QMessageBox::No | QMessageBox::Save);
+                    int button = msgBox2->exec();
+                    if ( button == QMessageBox::No)
+                    {
+                        delete msgBox2;
+                        return 0;
+                    }
+                    if ( button == QMessageBox::Save)
+                    {
+                        settings.setValue("disableSecureModeMessage",true);
+                    }
+                    qDebug()<<"getprop ro.secure - "<<tmp;
+                }
         QStringList args = qApp->arguments();
         if (args.count() > 1)
         {
@@ -259,7 +287,6 @@ int main(int argc, char *argv[])
         w.show();
 
         splash.finish(&w);
-
 
         return a.exec();
     }

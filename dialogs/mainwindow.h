@@ -25,6 +25,7 @@
 #include "../classes/phone.h"
 #include "../classes/computer.h"
 #include "logcatdialog.h"
+#include "kmsgdialog.h"
 #include "../classes/ecwin7.h"
 
 #include <stdio.h>
@@ -100,6 +101,7 @@ private:
     ConnectWifi *connectWifiDialog;
     AboutDialog aboutDialog;
     LogcatDialog *logcatDialog;
+    KmsgDialog *kmsgDialog;
 
     UpdateApp updateApp;
 //widgets
@@ -178,6 +180,7 @@ private slots:
     void updatesCheckFinished(bool, QString, QString, QString);
 
     void showLogcat();
+    void showKmsg();
     void smsReceived(QString number, QString body);
     void smsResult(QString result);
 

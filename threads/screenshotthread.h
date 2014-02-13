@@ -21,6 +21,7 @@
 #ifndef SCREENSHOTTHREAD_H
 #define SCREENSHOTTHREAD_H
 
+#include "../classes/phone.h"
 #include <QThread>
 #include <QTcpSocket>
 #include <QImage>
@@ -37,5 +38,9 @@ public:
     QTcpSocket *socket;
 signals:
     void gotScreenshot(QImage, int, int);
+
+private:
+    QProcess *buffer;
+    QProcess *convert;
 };
 #endif // SCREENSHOTTHREAD_H

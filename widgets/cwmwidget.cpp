@@ -254,8 +254,13 @@ void CwmWidget::connectionChanged()
             this->ui->tabWidget_2->setTabEnabled(0,false);
             tailLog();
         }
-        processFind->start("\""+sdk+"\"" + "adb shell mount /sdcard");
+        processFind->start("\""+sdk+"\"" + "adb shell su -c 'mount /sdcard'");
         processFind->waitForFinished(-1);
+        if (processFind->readAll().contains("su: not found"))
+        {
+            processFind->start("\""+sdk+"\"" + "adb shell mount /sdcard");
+            processFind->waitForFinished(-1);
+        }
         mountsUpdate();
     }
     else if (this->phone->getConnectionState() == FASTBOOT)
@@ -520,8 +525,13 @@ void CwmWidget::propsDialog()
 
 void CwmWidget::processFinished()
 {
-    processFind->start("\""+this->sdk+"\""+"adb shell busybox rm -r /cache/qtadb/");
+    processFind->start("\""+this->sdk+"\""+"adb shell su -c 'busybox rm -r /cache/qtadb/'");
     processFind->waitForFinished(-1);
+    if (processFind->readAll().contains("su: not found"))
+    {
+        processFind->start("\""+this->sdk+"\""+"adb shell busybox rm -r /cache/qtadb/");
+        processFind->waitForFinished(-1);
+    }
     ui->plainTextEditStatus->setStyleSheet( "QPlainTextEdit {background-color:black;color:lightgreen;border: 1px solid #020202;border-radius: 1px;}" );
     this->ui->plainTextEditStatus->insertPlainText("--------------------\n");
     this->ui->plainTextEditStatus->insertPlainText("Process Finished!\n");
@@ -566,8 +576,13 @@ void CwmWidget::processFinished()
 
 void CwmWidget::finishedWhich()
 {
-    processFind->start("\""+this->sdk+"\""+"adb shell busybox rm -r /cache/qtadb/");
+    processFind->start("\""+this->sdk+"\""+"adb shell su -c 'busybox rm -r /cache/qtadb/'");
     processFind->waitForFinished(-1);
+    if (processFind->readAll().contains("su: not found"))
+    {
+        processFind->start("\""+this->sdk+"\""+"adb shell busybox rm -r /cache/qtadb/");
+        processFind->waitForFinished(-1);
+    }
     if (which == "sdbackup")
     {
         which = "sdrestore";
@@ -619,13 +634,24 @@ void CwmWidget::on_buttonFixPermissions_pressed()
     commandRunning = "Not Running";
     this->processStarted();
     QString tool = "/system/bin/fix_permissions";
-    processFind->start("\""+sdk+"\"" + "adb shell busybox find " + tool);
+    processFind->start("\""+sdk+"\"" + "adb shell su -c 'busybox find " + tool+"'");
     processFind->waitForFinished(-1);
     QString outputFind = processFind->readAll();
+    if (outputFind.contains("su: not found"))
+    {
+        processFind->start("\""+sdk+"\"" + "adb shell busybox find " + tool);
+        processFind->waitForFinished(-1);
+        outputFind = processFind->readAll();
+    }
     if (outputFind.contains("No such file"))
         tool = this->adbPushTool("fix_permissions");
     process->start("\""+sdk+"\"" + "adb shell su -c '" + tool + "'");
-    process->waitForReadyRead(-1);
+    process->waitForFinished(-1);
+    if (process->readAll().contains("su: not found"))
+    {
+        process->start("\""+sdk+"\"" + "adb shell " + tool);
+        process->waitForFinished(-1);
+    }
 }
 
 void CwmWidget::printProcess(QString processOut)
@@ -689,13 +715,23 @@ void CwmWidget::buttonsDisabled()
 
 QString CwmWidget::adbPushTool(QString toolName)
 {
-    processFind->start("\""+this->sdk+"\""+"adb shell busybox mkdir -p /cache/qtadb");
+    processFind->start("\""+this->sdk+"\""+"adb shell su -c 'busybox mkdir -p /cache/qtadb'");
     processFind->waitForFinished(-1);
+    if (processFind->readAll().contains("su: not found"))
+    {
+        processFind->start("\""+this->sdk+"\""+"adb shell busybox mkdir -p /cache/qtadb");
+        processFind->waitForFinished(-1);
+    }
   //  disconnect(ui->tabWidget_2,SIGNAL(currentChanged(int)),this,SLOT(sdcardDisplay()));
     processFind->start("\""+this->sdk+"\""+"adb push \""+QDir::currentPath()+"/tools/" + toolName + "\" /cache/qtadb/"+ toolName);
     processFind->waitForFinished(-1);
-    processFind->start("\""+this->sdk+"\""+"adb shell busybox chmod 755 /cache/qtadb/" + toolName);
+    processFind->start("\""+this->sdk+"\""+"adb shell su -c 'busybox chmod 755 /cache/qtadb/" + toolName+"'");
     processFind->waitForFinished(-1);
+    if (processFind->readAll().contains("su: not found"))
+    {
+        processFind->start("\""+this->sdk+"\""+"adb shell busybox chmod 755 /cache/qtadb/" + toolName);
+        processFind->waitForFinished(-1);
+    }
     toolName.prepend("/cache/qtadb/");
     return toolName;
 }
@@ -790,8 +826,13 @@ void CwmWidget::extendedcommandFile(QString infoLine, QString commandLine)
     }
     if (infoLine == "execute commands")
     {
-        processFind->start("\""+this->sdk+"\""+"adb shell busybox rm -f /cache/recovery/command");
+        processFind->start("\""+this->sdk+"\""+"adb shell su -c 'busybox rm -f /cache/recovery/command'");
         processFind->waitForFinished(-1);
+        if (processFind->readAll().contains("su: not found"))
+        {
+            processFind->start("\""+this->sdk+"\""+"adb shell busybox rm -f /cache/recovery/command");
+            processFind->waitForFinished(-1);
+        }
         processFind->start("\""+this->sdk+"\""+"adb push \""+QDir::currentPath()+"/tmp/extendedcommand\" /cache/recovery/");
         processFind->waitForFinished(-1);
         extendedcommand.remove();
@@ -808,15 +849,25 @@ void CwmWidget::extendedcommandFile(QString infoLine, QString commandLine)
 void CwmWidget::tailLog()
 {
     processStarted();
-    process->start("\""+this->sdk+"\""+"adb shell busybox tail -f -n 1000 /tmp/recovery.log");
-    process->waitForReadyRead(-1);
+    process->start("\""+this->sdk+"\""+"adb shell su -c 'busybox tail -f -n 1000 /tmp/recovery.log'");
+    process->waitForFinished(-1);
+    if (process->readAll().contains("su: not found"))
+    {
+        process->start("\""+this->sdk+"\""+"adb shell busybox tail -f -n 1000 /tmp/recovery.log");
+        process->waitForFinished(-1);
+    }
 }
 
 void CwmWidget::readFromLog()
 {
     QProcess tmpremove;
-    tmpremove.start("\""+this->sdk+"\""+"adb shell busybox rm -r /cache/qtadb/");
+    tmpremove.start("\""+this->sdk+"\""+"adb shell su -c 'busybox rm -r /cache/qtadb/'");
     tmpremove.waitForFinished(-1);
+    if (tmpremove.readAll().contains("su: not found"))
+    {
+        tmpremove.start("\""+this->sdk+"\""+"adb shell busybox rm -r /cache/qtadb/");
+        tmpremove.waitForFinished(-1);
+    }
     this->ui->plainTextEditStatus->clear();
     this->ui->plainTextEditStatus->insertPlainText("--------------------\n");
     this->ui->plainTextEditStatus->insertPlainText("Log Begins...\n");
@@ -824,16 +875,30 @@ void CwmWidget::readFromLog()
     this->ui->plainTextEditStatus->ensureCursorVisible();
     ui->plainTextEditStatus->setStyleSheet( "QPlainTextEdit {background-color:black;color:lightgreen;border: 1px solid #020202;border-radius: 1px;}" );
     this->setCustomFonts();
-    processFind->start("\""+this->sdk+"\""+"adb shell busybox find /cache/recovery/log");
+    processFind->start("\""+this->sdk+"\""+"adb shell su -c 'busybox find /cache/recovery/log'");
     processFind->waitForFinished(-1);
     QString out = processFind->readAll();
+    if (processFind->readAll().contains("su: not found"))
+    {
+        processFind->start("\""+this->sdk+"\""+"adb shell busybox find /cache/recovery/log");
+        processFind->waitForFinished(-1);
+        out = processFind->readAll();
+    }
     QProcess log;
     log.setProcessChannelMode(QProcess::MergedChannels);
     if (out.contains("No such file"))
-        log.start("\""+this->sdk+"\""+"adb shell busybox cat /cache/recovery/last_log");
+        log.start("\""+this->sdk+"\""+"adb shell su -c 'busybox cat /cache/recovery/last_log'");
     else
-        log.start("\""+this->sdk+"\""+"adb shell busybox cat /cache/recovery/log");
+        log.start("\""+this->sdk+"\""+"adb shell su -c 'busybox cat /cache/recovery/log'");
     log.waitForFinished(-1);
+    if (log.readAll().contains("su: not found"))
+    {
+        if (out.contains("No such file"))
+            log.start("\""+this->sdk+"\""+"adb shell busybox cat /cache/recovery/last_log");
+        else
+            log.start("\""+this->sdk+"\""+"adb shell busybox cat /cache/recovery/log");
+        log.waitForFinished(-1);
+    }
     QString processOut = QString::fromUtf8(log.readAll());
     this->printProcess(processOut);
     this->threadSdcard->sleep(1);
@@ -858,8 +923,13 @@ void CwmWidget::readFromLog()
         if (!this->backupPath.isEmpty())
         {
             this->threadSdcard->sleep(3);
-            processFind->start("\""+this->sdk+"\"" + "adb shell busybox find /dev/block/mmc*");
+            processFind->start("\""+this->sdk+"\"" + "adb shell su -c 'busybox find /dev/block/mmc*'");
             processFind->waitForFinished(-1);
+            if (processFind->readAll().contains("su: not found"))
+            {
+                processFind->start("\""+this->sdk+"\"" + "adb shell busybox find /dev/block/mmc*");
+                processFind->waitForFinished(-1);
+            }
             QString out = processFind->readAll();
             if (!out.contains("No such file"))
             {
@@ -1012,14 +1082,26 @@ void CwmWidget::buttonsEnabled()
     if (this->ui->tabWidget_3->currentIndex() == 2)
     {
         QProcess down;
-        down.start("\"" + sdk + "\"" + "adb shell busybox ls -l /cache/download");
-        down.waitForReadyRead(-1);
+        down.start("\"" + sdk + "\"" + "adb shell su -c 'busybox ls -l /cache/download'");
+        down.waitForFinished(-1);
         QString out = down.readAll();
+        if (out.contains("su: not found"))
+        {
+            down.start("\"" + sdk + "\"" + "adb shell busybox ls -l /cache/download");
+            down.waitForFinished(-1);
+            out = down.readAll();
+        }
         if (out.contains("/cache/download ->"))
         {
-            down.start("\"" + sdk + "\"" + "adb shell busybox ls -l /sdcard/cache/download");
-            down.waitForReadyRead(-1);
+            down.start("\"" + sdk + "\"" + "adb shell su -c 'busybox ls -l /sdcard/cache/download'");
+            down.waitForFinished(-1);
             QString out = down.readAll();
+            if (out.contains("su: not found"))
+            {
+                down.start("\"" + sdk + "\"" + "adb shell busybox ls -l /sdcard/cache/download");
+                down.waitForFinished(-1);
+                out = down.readAll();
+            }
             if (!out.contains("No such file"))
             {
                 this->ui->buttonFixMarket->setText("Undo Fix Market");
@@ -1039,9 +1121,15 @@ void CwmWidget::buttonsEnabled()
         if (!this->ui->lineUpdate->text().isEmpty())
         {
             QProcess link;
-            link.start("\"" + sdk + "\"" + "adb shell busybox find /system/etc/init.d/11link2sd");
-            link.waitForReadyRead(-1);
+            link.start("\"" + sdk + "\"" + "adb shell su -c 'busybox find /system/etc/init.d/11link2sd'");
+            link.waitForFinished(-1);
             QString out = link.readAll();
+            if (out.contains("su: not found"))
+            {
+                link.start("\"" + sdk + "\"" + "adb shell busybox find /system/etc/init.d/11link2sd");
+                link.waitForFinished(-1);
+                out = link.readAll();
+            }
             if (!out.contains("No such file"))
                 this->ui->checkLink2Sd->setEnabled(true);
             else
@@ -1056,8 +1144,13 @@ void CwmWidget::on_buttonSdinfo_pressed()
 {
     this->adbPushTool("parted");
     this->processStarted();
-    process->start("\""+this->sdk+"\""+"adb shell /cache/qtadb/parted /dev/block/mmcblk0 print");
+    process->start("\""+this->sdk+"\""+"adb shell su -c '/cache/qtadb/parted /dev/block/mmcblk0 print'");
     process->waitForFinished(-1);
+    if (process->readAll().contains("su: not found"))
+    {
+        process->start("\""+this->sdk+"\""+"adb shell /cache/qtadb/parted /dev/block/mmcblk0 print");
+        process->waitForFinished(-1);
+    }
     this->readFromProcess();
 }
 
@@ -1157,8 +1250,13 @@ void CwmWidget::on_buttonInsert_pressed()
                     QMessageBox::information(this,"Insert Selection:",tr("No empty space allowed in Directory Path/Name!"));
                     return;
                 }
-                processFind->start("\""+this->sdk+"\""+"adb shell busybox ls \"" + this->codec->toUnicode(itemPath.toUtf8()) + "\"");
+                processFind->start("\""+this->sdk+"\""+"adb shell su -c 'busybox ls \"" + this->codec->toUnicode(itemPath.toUtf8()) + "\"'");
                 processFind->waitForFinished(-1);
+                if (processFind->readAll().contains("su: not found"))
+                {
+                    processFind->start("\""+this->sdk+"\""+"adb shell busybox ls \"" + this->codec->toUnicode(itemPath.toUtf8()) + "\"");
+                    processFind->waitForFinished(-1);
+                }
                 QString output = processFind->readAll();
                 if (output.contains("nandroid.md5"))
                     if (QMessageBox::question(this, tr("Insert Selection:"),"Directory \"" + itemPath + "\" seems to contain Nandroid Backup already.\nDo you want to overwrite it?",QMessageBox::Yes | QMessageBox::No) == QMessageBox::No)
@@ -1191,8 +1289,13 @@ void CwmWidget::on_buttonInsert_pressed()
                 this->setCustomFonts();
                 this->ui->tabWidget_2->setCurrentIndex(1);
                 this->adbPushTool("domd5sum.sh");
-                processWhich->start("\""+sdk+"\"" + "adb shell /cache/qtadb/domd5sum.sh " + this->codec->toUnicode(itemPath.toUtf8()));
-                processWhich->waitForReadyRead(-1);
+                processWhich->start("\""+sdk+"\"" + "adb shell su -c '/cache/qtadb/domd5sum.sh " + this->codec->toUnicode(itemPath.toUtf8())+"'");
+                processWhich->waitForFinished(-1);
+                if (processWhich->readAll().contains("su: not found"))
+                {
+                    processWhich->start("\""+sdk+"\"" + "adb shell /cache/qtadb/domd5sum.sh " + this->codec->toUnicode(itemPath.toUtf8()));
+                    processWhich->waitForFinished(-1);
+                }
             }
         }
         if (this->ui->tabWidget->currentIndex() == 5)
@@ -1289,8 +1392,13 @@ void CwmWidget::activateButtonInsert()
         {
             if (itemPath.startsWith("/sdcard/") && itemType == "dir")
             {
-                processFind->start("\""+this->sdk+"\""+"adb shell busybox ls \"" + this->codec->toUnicode(itemPath.toUtf8()) + "\"");
+                processFind->start("\""+this->sdk+"\""+"adb shell su -c 'busybox ls \"" + this->codec->toUnicode(itemPath.toUtf8()) + "\"'");
                 processFind->waitForFinished(-1);
+                if (processFind->readAll().contains("su: not found"))
+                {
+                    processFind->start("\""+this->sdk+"\""+"adb shell busybox ls \"" + this->codec->toUnicode(itemPath.toUtf8()) + "\"");
+                    processFind->waitForFinished(-1);
+                }
                 QString output = processFind->readAll();
                 if (output.contains("nandroid.md5"))
                 {
@@ -1444,8 +1552,13 @@ void ThreadSdcard::run()
     do
     {
         this->sleep(5);
-        sd.start("\""+this->sdk+"\"" + "adb shell busybox find \"" + codec->toUnicode(this->backupPath.toUtf8()) + "\"");
+        sd.start("\""+this->sdk+"\"" + "adb shell su -c 'busybox find \"" + codec->toUnicode(this->backupPath.toUtf8()) + "\"'");
         sd.waitForFinished(-1);
+        if (sd.readAll().contains("su: not found"))
+        {
+            sd.start("\""+this->sdk+"\"" + "adb shell busybox find \"" + codec->toUnicode(this->backupPath.toUtf8()) + "\"");
+            sd.waitForFinished(-1);
+        }
         QString outsd = sd.readAll();
         if (!outsd.contains("No such file"))
             break;
@@ -1535,8 +1648,13 @@ void CwmWidget::backupAvailable()
         this->setCustomFonts();
         this->ui->tabWidget_2->setCurrentIndex(1);
         this->adbPushTool("domd5sum.sh");
-        processWhich->start("\""+sdk+"\"" + "adb shell /cache/qtadb/domd5sum.sh \"" + codec->toUnicode(this->threadSdcard->backupPath.toUtf8()) + "\"" );
-        processWhich->waitForReadyRead(-1);
+        processWhich->start("\""+sdk+"\"" + "adb shell su -c '/cache/qtadb/domd5sum.sh \"" + codec->toUnicode(this->threadSdcard->backupPath.toUtf8()) + "\"'" );
+        processWhich->waitForFinished(-1);
+        if (processWhich->readAll().contains("su: not found"))
+        {
+            processWhich->start("\""+sdk+"\"" + "adb shell /cache/qtadb/domd5sum.sh \"" + codec->toUnicode(this->threadSdcard->backupPath.toUtf8()) + "\"" );
+            processWhich->waitForFinished(-1);
+        }
     }
     else if (which == "fix market")
         this->fixMarket();
@@ -1640,9 +1758,15 @@ void CwmWidget::on_buttonFixMarket_pressed()
     this->ui->plainTextEditStatus->ensureCursorVisible();
     QProcess *sd = new QProcess;
     QString outsd;
-    sd->start("\""+this->sdk+"\"" + "adb shell busybox find /dev/block/mmc*");
+    sd->start("\""+this->sdk+"\"" + "adb shell su -c 'busybox find /dev/block/mmc*'");
     sd->waitForFinished(-1);
     outsd = sd->readAll();
+    if (outsd.contains("su: not found"))
+    {
+        sd->start("\""+this->sdk+"\"" + "adb shell busybox find /dev/block/mmc*");
+        sd->waitForFinished(-1);
+        outsd = sd->readAll();
+    }
     if (outsd.contains("No such file"))
     {
         if (QMessageBox::question(this, tr("Reboot:"),"Your phone failed to detect SD Card! Reboot is required.\n\nDo you want to Reboot it now?",QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
@@ -1654,9 +1778,15 @@ void CwmWidget::on_buttonFixMarket_pressed()
         }
         return;
     }
-    sd->start("\""+this->sdk+"\"" + "adb shell busybox ls /sdcard");
+    sd->start("\""+this->sdk+"\"" + "adb shell su -c 'busybox ls /sdcard'");
     sd->waitForFinished(-1);
     outsd = sd->readAll();
+    if (outsd.contains("su: not found"))
+    {
+        sd->start("\""+this->sdk+"\"" + "adb shell busybox ls /sdcard");
+        sd->waitForFinished(-1);
+        outsd = sd->readAll();
+    }
     if (outsd.isEmpty())
     {
         which = "fix market";
@@ -1677,14 +1807,24 @@ void CwmWidget::on_buttonRecovery_pressed()
     which = "flash recovery";
     QString imgPath = this->ui->lineRecovery->text();
     QString tool = "/system/bin/flash_image";
-    processFind->start("\""+sdk+"\"" + "adb shell busybox find " + tool);
+    processFind->start("\""+sdk+"\"" + "adb shell su -c 'busybox find " + tool+"'");
     processFind->waitForFinished(-1);
+    if (processFind->readAll().contains("su: not found"))
+    {
+        processFind->start("\""+sdk+"\"" + "adb shell busybox find " + tool);
+        processFind->waitForFinished(-1);
+    }
     QString outputFind = processFind->readAll();
     if (outputFind.contains("No such file"))
           tool = this->adbPushTool("flash_image");
     this->processStarted();
     process->start("\""+sdk+"\"" + "adb shell su -c \"" + tool + " recovery '" + this->codec->toUnicode(imgPath.toUtf8()) + "'\"");
-    process->waitForReadyRead(-1);
+    process->waitForFinished(-1);
+    if (process->readAll().contains("su: not found"))
+    {
+        process->start("\""+sdk+"\"" + "adb shell " + tool + " recovery '" + this->codec->toUnicode(imgPath.toUtf8()) + "'");
+        process->waitForFinished(-1);
+    }
 }
 
 void CwmWidget::sdbackupCanceled()
@@ -1793,8 +1933,15 @@ void CwmWidget::mountsUpdate()
     if (this->ui->tabWidget_3->currentIndex() == 0)
     {
         QProcess df;
-        df.start("\""+sdk+"\"" + "adb shell busybox df");
+        df.start("\""+sdk+"\"" + "adb shell su -c 'busybox df'");
         df.waitForFinished(-1);
+        int device = 1;
+        if (df.readAll().contains("su: not found"))
+        {
+            df.start("\""+sdk+"\"" + "adb shell busybox df");
+            df.waitForFinished(-1);
+            device = 0;
+        }
         QString out = df.readAll();
         if (out.contains("/cache"))
             this->ui->buttonCache-> setText("Unmount /cache");
@@ -1804,19 +1951,19 @@ void CwmWidget::mountsUpdate()
             this->ui->buttonData-> setText("Unmount /data");
         else
             this->ui->buttonData-> setText("Mount /data");
-        if (this->phone->getConnectionState() == RECOVERY)
+        if (device == 0)
         {
             if (out.contains("/system"))
                 this->ui->buttonSystem-> setText("Unmount /system");
             else
                 this->ui->buttonSystem-> setText("Mount /system");
         }
-        if (this->phone->getConnectionState() == DEVICE)
+        if (device == 1)
         {
-            df.start("\""+sdk+"\"" + "adb shell busybox mount");
-            df.waitForFinished(-1);
-            out = df.readAll();
-            if (out.contains("/system type yaffs2 (ro"))
+            QProcess system;
+            system.start("\""+sdk+"\"" + "adb remount");
+            system.waitForFinished(-1);
+            if (system.readAll().contains("/system type yaffs2 (ro"))
                 this->ui->buttonSystem-> setText("Remount /system Read/Write");
             else if (out.contains("/system type yaffs2 (rw"))
                 this->ui->buttonSystem-> setText("Remount /system Read-Only");
@@ -1839,8 +1986,13 @@ void CwmWidget::on_buttonCache_pressed()
         command = "umount";
     else if (this->ui->buttonCache->text() == "Mount /cache")
         command = "mount";
-    processFind->start("\""+sdk+"\"" + "adb shell busybox " + command + " /cache");
+    processFind->start("\""+sdk+"\"" + "adb shell su -c 'busybox " + command + " /cache'");
     processFind->waitForFinished(-1);
+    if (processFind->readAll().contains("su: not found"))
+    {
+        processFind->start("\""+sdk+"\"" + "adb shell busybox " + command + " /cache");
+        processFind->waitForFinished(-1);
+    }
     mountsUpdate();
 }
 
@@ -1851,24 +2003,40 @@ void CwmWidget::on_buttonData_pressed()
         command = "umount";
     else if (this->ui->buttonData->text() == "Mount /data")
         command = "mount";
-    processFind->start("\""+sdk+"\"" + "adb shell busybox " + command + " /data");
+    processFind->start("\""+sdk+"\"" + "adb shell su -c 'busybox " + command + " /data'");
     processFind->waitForFinished(-1);
+    if (processFind->readAll().contains("su: not found"))
+    {
+        processFind->start("\""+sdk+"\"" + "adb shell busybox " + command + " /data");
+        processFind->waitForFinished(-1);
+    }
     mountsUpdate();
 }
 
 void CwmWidget::on_buttonSystem_pressed()
 {
-    QString command = "";
-    if (this->ui->buttonSystem->text() == "Unmount /system")
-        command = "umount";
-    else if (this->ui->buttonSystem->text() == "Mount /system")
-        command = "mount";
-    else if (this->ui->buttonSystem->text() == "Remount /system Read/Write")
-        command = "mount -o remount,rw";
-    else if (this->ui->buttonSystem->text() == "Remount /system Read-Only")
-        command = "mount -o remount,ro,noatime";
-    processFind->start("\""+sdk+"\"" + "adb shell busybox " + command + " /system");
+    processFind->start("\""+sdk+"\"" + "adb shell su");
     processFind->waitForFinished(-1);
+    if (processFind->readAll().contains("su: not found"))
+    {
+        if (this->ui->buttonSystem->text() == "Unmount /system")
+            processFind->start("\""+sdk+"\"" + "adb shell busybox umount /system");
+        else if (this->ui->buttonSystem->text() == "Mount /system")
+            processFind->start("\""+sdk+"\"" + "adb shell busybox mount /system");
+        processFind->waitForFinished(-1);
+    }
+    else
+    {
+        if (this->ui->buttonSystem->text() == "Unmount /system")
+            processFind->start("\""+sdk+"\"" + "adb shell su -c 'busybox umount /system'");
+        else if (this->ui->buttonSystem->text() == "Mount /system")
+            processFind->start("\""+sdk+"\"" + "adb remount");
+        else if (this->ui->buttonSystem->text() == "Remount /system Read/Write")
+            processFind->start("\""+sdk+"\"" + "adb shell su -c 'busybox mount -o remount,rw /system'");
+        else if (this->ui->buttonSystem->text() == "Remount /system Read-Only")
+             processFind->start("\""+sdk+"\"" + "adb shell su -c 'busybox mount -o remount,ro,noatime /system'");
+        processFind->waitForFinished(-1);
+    }
     mountsUpdate();
 }
 
@@ -1879,8 +2047,13 @@ void CwmWidget::on_buttonSdext_pressed()
         command = "umount";
     else if (this->ui->buttonSdext->text() == "Mount /sd-ext")
         command = "mount";
-    processFind->start("\""+sdk+"\"" + "adb shell busybox " + command + " /sd-ext");
+    processFind->start("\""+sdk+"\"" + "adb shell su -c 'busybox " + command + " /sd-ext'");
     processFind->waitForFinished(-1);
+    if (processFind->readAll().contains("su: not found"))
+    {
+        processFind->start("\""+sdk+"\"" + "adb shell busybox " + command + " /sd-ext");
+        processFind->waitForFinished(-1);
+    }
     mountsUpdate();
 }
 
@@ -1891,8 +2064,13 @@ void CwmWidget::on_buttonSdcard_pressed()
         command = "umount";
     else if (this->ui->buttonSdcard->text() == "Mount /sdcard")
         command = "mount";
-    processFind->start("\""+sdk+"\"" + "adb shell busybox " + command + " /sdcard");
+    processFind->start("\""+sdk+"\"" + "adb shell su -c 'busybox " + command + " /sdcard'");
     processFind->waitForFinished(-1);
+    if (processFind->readAll().contains("su: not found"))
+    {
+        processFind->start("\""+sdk+"\"" + "adb shell busybox " + command + " /sdcard");
+        processFind->waitForFinished(-1);
+    }
     mountsUpdate();
 }
 
@@ -1912,8 +2090,13 @@ void CwmWidget::fixMarket()
     else if (this->ui->buttonFixMarket->text() == "Fix Market")
         market = this->adbPushTool("dofixmarket.sh");
     this->processStarted();
-    process->start("\"" + sdk + "\"" + "adb shell " + market);
+    process->start("\"" + sdk + "\"" + "adb shell su -c '" + market+"'");
     process->waitForReadyRead(-1);
+    if (process->readAll().contains("su: not found"))
+    {
+        process->start("\"" + sdk + "\"" + "adb shell " + market);
+        process->waitForReadyRead(-1);
+    }
 }
 
 void CwmWidget::on_buttonBrowse_pressed()
@@ -1931,24 +2114,44 @@ void CwmWidget::on_buttonRun_pressed()
     QString script = this->ui->lineScript->text();
     if (QMessageBox::question(this, tr("Run Script:"),"Are you sure you want to run\n\"" + script + "\"?",QMessageBox::Yes | QMessageBox::No) == QMessageBox::No)
         return;
-    processFind->start("\""+this->sdk+"\""+"adb shell busybox mkdir -p /cache/qtadb");
+    processFind->start("\""+this->sdk+"\""+"adb shell su -c 'busybox mkdir -p /cache/qtadb'");
     processFind->waitForFinished(-1);
+    if (processFind->readAll().contains("su: not found"))
+    {
+        processFind->start("\""+this->sdk+"\""+"adb shell busybox mkdir -p /cache/qtadb");
+        processFind->waitForFinished(-1);
+    }
     this->processStarted();
     commandRunning = "Not Running";
     if (script.startsWith("/sdcard/"))
     {
-        processFind->start("\""+this->sdk+"\""+"adb shell busybox cp \""+ this->codec->toUnicode(script.toUtf8()) + "\" /cache/qtadb/script.sh");
+        processFind->start("\""+this->sdk+"\""+"adb shell su -c 'busybox cp \""+ this->codec->toUnicode(script.toUtf8()) + "\" /cache/qtadb/script.sh'");
         processFind->waitForFinished(-1);
+        if (processFind->readAll().contains("su: not found"))
+        {
+            processFind->start("\""+this->sdk+"\""+"adb shell busybox cp \""+ this->codec->toUnicode(script.toUtf8()) + "\" /cache/qtadb/script.sh");
+            processFind->waitForFinished(-1);
+        }
     }
     else
     {
         processFind->start("\""+this->sdk+"\""+"adb push \""+ script + "\" /cache/qtadb/script.sh");
         processFind->waitForFinished(-1);
     }
-    processFind->start("\""+this->sdk+"\""+"adb shell busybox chmod 777 /cache/qtadb/script.sh");
+    processFind->start("\""+this->sdk+"\""+"adb shell su -c 'busybox chmod 777 /cache/qtadb/script.sh'");
     processFind->waitForFinished(-1);
+    if (processFind->readAll().contains("su: not found"))
+    {
+        processFind->start("\""+this->sdk+"\""+"adb shell busybox chmod 777 /cache/qtadb/script.sh");
+        processFind->waitForFinished(-1);
+    }
     process->start("\""+sdk+"\"" + "adb shell su -c 'sh /cache/qtadb/script.sh'");
-    process->waitForReadyRead(-1);
+    process->waitForFinished(-1);
+    if (process->readAll().contains("su: not found"))
+    {
+        process->start("\""+sdk+"\"" + "adb shell sh /cache/qtadb/script.sh");
+        process->waitForFinished(-1);
+    }
 }
 
 void CwmWidget::disableCwm()
